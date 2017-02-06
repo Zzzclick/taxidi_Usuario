@@ -12,7 +12,40 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="Hello World!"
         android:id="@+id/infoTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:id="@+id/textViewBase"
+        android:layout_below="@+id/infoTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editTextBase"
+        android:layout_alignRight="@+id/editTextBase"
+        android:layout_alignEnd="@+id/editTextBase"
+        android:layout_marginTop="42dp"
+        android:id="@+id/buttonBase"
+        tools:text="Enviar" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_marginBottom="37dp"
+        android:id="@+id/editTextBase"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:hint="Escribe aqui" />
 </RelativeLayout>
