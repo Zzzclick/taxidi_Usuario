@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.widget.Button;
+import android.content.Intent;
 
 public class MainActivity extends AppCompatActivity {
     private TextView mensajeTextView;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         mensajeTextView = (TextView) findViewById(R.id.textViewBase);
         mensajeEditText = (EditText) findViewById(R.id.editTextBase);
         Button boton1 = (Button)findViewById(R.id.buttonBase);
+        Button botonEnviar=(Button)findViewById(R.id.buttonEnviar);
 
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
@@ -45,13 +47,22 @@ public class MainActivity extends AppCompatActivity {
         String token = FirebaseInstanceId.getInstance().getToken();
 
         Log.d(TAG, "Token: " + token);
+
         boton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 modificar();
             }
         });
+        botonEnviar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, Registro.class );
+                startActivity(i);
+            }
+        });
     }
+
 
     @Override
     protected void onStart() {
