@@ -10,24 +10,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.zzzclcik.pruebafirebase.MainActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/infoTextView" />
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="128dp"
-        android:id="@+id/textViewBase"
-        android:layout_below="@+id/infoTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <Button
-        android:text="Button"
+        android:text="Enviar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignTop="@+id/editTextBase"
@@ -35,7 +19,11 @@
         android:layout_alignEnd="@+id/editTextBase"
         android:layout_marginTop="42dp"
         android:id="@+id/buttonBase"
-        tools:text="Enviar" />
+        tools:text="Enviar"
+        android:elevation="23dp"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:background="@color/colorAccent"
+        android:textStyle="normal|bold" />
 
     <EditText
         android:layout_width="match_parent"
@@ -49,13 +37,76 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Button
-        android:text="Registro"
-        android:layout_width="wrap_content"
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/infoTextView"
+        android:id="@+id/textViewBase"
+        android:layout_above="@+id/buttonBase"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="42dp"
-        android:id="@+id/buttonEnviar" />
+        android:layout_marginBottom="67dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/editTextEmail"
+        android:hint="Correo electronico" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:layout_below="@+id/editTextEmail"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="26dp"
+        android:id="@+id/editTextClave"
+        android:hint="Contraseña" />
+
+    <Button
+        android:text="Iniciar sesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonEntrar"
+        android:background="@color/colorAccent"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:elevation="24dp"
+        android:textStyle="normal|bold"
+        android:textSize="18sp"
+        android:layout_below="@+id/editTextClave"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="18dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="21dp"
+        android:id="@+id/infoTextView"
+        android:layout_above="@+id/textViewBase"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Registrarse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonEnviar"
+        android:background="@color/colorAccent"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:elevation="23dp"
+        android:textStyle="normal|bold"
+        android:textSize="18sp"
+        android:layout_marginTop="13dp"
+        android:layout_below="@+id/buttonEntrar"
+        android:layout_alignRight="@+id/buttonEntrar"
+        android:layout_alignEnd="@+id/buttonEntrar" />
 </RelativeLayout>
