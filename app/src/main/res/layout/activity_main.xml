@@ -109,4 +109,15 @@
         android:layout_below="@+id/buttonEntrar"
         android:layout_alignRight="@+id/buttonEntrar"
         android:layout_alignEnd="@+id/buttonEntrar" />
+
+    <Button
+        android:text="GPS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonBase"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/buttonGPS"
+        android:background="@color/colorAccent"
+        android:textColor="@color/cast_expanded_controller_text_color" />
 </RelativeLayout>

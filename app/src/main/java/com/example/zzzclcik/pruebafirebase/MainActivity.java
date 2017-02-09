@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button boton1 = (Button)findViewById(R.id.buttonBase);
         Button botonEnviar=(Button)findViewById(R.id.buttonEnviar);
+        Button botonGps=(Button)findViewById(R.id.buttonGPS);
 
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
@@ -92,6 +93,13 @@ modificar();
             public void onClick(View view)
             {
              doLogin();
+            }
+        });
+        botonGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, MapsActivity.class );
+                startActivity(i);
             }
         });
         mAuthListener=new FirebaseAuth.AuthStateListener() {
