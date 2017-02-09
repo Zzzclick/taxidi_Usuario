@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mensajeRef = ref.child("mensaje");
+    DatabaseReference mensajeRef2 = ref.child("ubicación");
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -133,11 +134,23 @@ modificar();
 
             }
         });
+        mensajeRef2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void modificar() {
         String mensaje = mensajeEditText.getText().toString();
         mensajeRef.setValue(mensaje);
+
         mensajeEditText.setText("");
     }
     public void doLogin()

@@ -62,8 +62,8 @@ startRegister();
                             mProgress.dismiss();
                             if(task.isSuccessful())
                             {
-                                //String user_id=mAuth.getCurrentUser().getUid();
-                                //Toast.makeText(Registro.this,user_id,Toast.LENGTH_SHORT).show();
+                                String user_id=mAuth.getCurrentUser().getUid();
+                                Toast.makeText(Registro.this,user_id,Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
