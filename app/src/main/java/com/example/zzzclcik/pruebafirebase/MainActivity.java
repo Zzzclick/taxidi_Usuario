@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mensajeRef = ref.child("mensaje");
-    DatabaseReference mensajeRef2 = ref.child("ubicación");
+    DatabaseReference mensajeRef2 = ref2.child("ubicacion");
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -109,8 +110,8 @@ modificar();
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
-                    Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT);
-                 //   mAuth.signOut();
+                    Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
+                    //mAuth.signOut();
                 }
             }
         };
@@ -127,7 +128,7 @@ modificar();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
-                mensajeTextView.setText("En la base esta"+value);
+                mensajeTextView.setText("En la base esta:"+value);
             }
 
             @Override
@@ -138,7 +139,8 @@ modificar();
         mensajeRef2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                String value = dataSnapshot.getValue(String.class);
+                infoTextView.setText("Ubicación:"+value);
             }
 
             @Override
@@ -167,13 +169,14 @@ modificar();
                     progressDialog.dismiss();
                     if(task.isSuccessful())
                     {
-                        Toast.makeText(MainActivity.this,"Logueo correcto",Toast.LENGTH_SHORT);
+                        Toast.makeText(MainActivity.this,"Logueo correcto",Toast.LENGTH_SHORT).show();
                         Intent i = new Intent(MainActivity.this, MapsActivity.class );
                         startActivity(i);
                     }
                     else
                     {
-                        Toast.makeText(MainActivity.this,"Logueo fallido",Toast.LENGTH_SHORT);
+                        Toast.makeText(MainActivity.this,"Logueo fallido",Toast.LENGTH_LONG).show();
+
                     }
                 }
             });

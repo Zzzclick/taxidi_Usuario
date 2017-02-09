@@ -20,7 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
-
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -38,6 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
     }
 
 
@@ -54,10 +56,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(20.1352722, -98.38046810000003);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Upt"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(20.1453953, -98.67203239999998), 16));
+
+        // You can customize the marker image using images bundled with
+        // your app, or dynamically generated bitmaps.
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(20.1453953, -98.67203239999998)));
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
