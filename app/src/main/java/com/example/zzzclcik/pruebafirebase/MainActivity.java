@@ -93,7 +93,8 @@ modificar();
             @Override
             public void onClick(View view)
             {
-             doLogin();
+                doLogin();
+
             }
         });
         botonGps.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +168,8 @@ modificar();
                     if(task.isSuccessful())
                     {
                         Toast.makeText(MainActivity.this,"Logueo correcto",Toast.LENGTH_SHORT);
+                        Intent i = new Intent(MainActivity.this, MapsActivity.class );
+                        startActivity(i);
                     }
                     else
                     {
