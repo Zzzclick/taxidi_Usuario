@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mensajeRef = ref.child("mensaje");
+
+    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mensajeRef2 = ref2.child("ubicacion");
 
     private FirebaseAuth mAuth;
