@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -112,6 +111,7 @@ modificar();
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
+
                     //mAuth.signOut();
                 }
             }
@@ -141,7 +141,8 @@ modificar();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
-                infoTextView.setText("Ubicación:"+value);
+               double aux= Double.parseDouble(value);
+                infoTextView.setText("Ubicación:"+aux);
             }
 
             @Override

@@ -1,5 +1,6 @@
 package com.example.zzzclcik.pruebafirebase;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -23,24 +24,89 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.AuthResult;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_REQUEST_CODE = 1;
     private GoogleMap mMap;
-
+    private double value1,value2;
+    DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mensajeRef1 = ref1.child("ubicacion1");
+    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mensajeRef2 = ref2.child("ubicacion2");
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        cargarValues();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mAuthListener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser()!=null)
+                {
+                    Toast.makeText(MapsActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
+
+                    //mAuth.signOut();
+                }
+            }
+        };
 
     }
+
+
+    protected void cargarValues() {
+
+
+
+
+        mensajeRef1.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                value1 = dataSnapshot.getValue(double.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(),"Error value 1", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+
+
+        mensajeRef2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                value2 = dataSnapshot.getValue(double.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(),"Error value 2", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
 
 
     /**
@@ -56,16 +122,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(20.1453953, -98.67203239999998), 16));
 
         // You can customize the marker image using images bundled with
         // your app, or dynamically generated bitmaps.
+        //while (value1 == 0 && value2 == 0) {        }
         mMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(20.1453953, -98.67203239999998)));
+                .position(new LatLng(value1, value2)));
+        System.out.println(value1 + "    aqui   " + value2);
 
+
+/*              mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(20.1453953, -98.66203239999998)));
+*/
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
@@ -84,5 +159,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+
     }
 }

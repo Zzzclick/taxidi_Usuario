@@ -65,7 +65,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="71dp"
         android:id="@+id/buttonRegistrar"
-        android:elevation="0dp"
+        android:elevation="24dp"
         android:textStyle="normal|bold"
         android:background="#FF4081"
         android:textColor="#FFFFFF" />
