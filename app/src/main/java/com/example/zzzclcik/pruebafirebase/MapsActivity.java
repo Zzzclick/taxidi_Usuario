@@ -50,10 +50,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         cargarValues();
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        /* Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        */
+
 
         mAuthListener=new FirebaseAuth.AuthStateListener() {
             @Override
@@ -104,7 +105,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        if (value1==0 && value2==0)
+        {
+           try {
+            Thread.sleep(1500);
+               Toast.makeText(getApplicationContext(),"Corriendo hilo", Toast.LENGTH_SHORT).show();
 
+           }catch (InterruptedException e){e.printStackTrace();}
+        }
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
 
@@ -134,6 +145,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                 .position(new LatLng(value1, value2)));
         System.out.println(value1 + "    aqui   " + value2);
+
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(value1+0.00001, value2-0.00001)));
+        System.out.println(value1+0.00001 + "    aqui   " + value2+0.00001);
+
+
+
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(value1+0.00002, value2-0.00002)));
+        System.out.println(value1+0.00002 + "    aqui   " + value2+0.00002);
+
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(value1+0.00003, value2-0.00003)));
+        System.out.println(value1+0.00003 + "    aqui   " + value2+0.00003);
 
 
 /*              mMap.addMarker(new MarkerOptions()

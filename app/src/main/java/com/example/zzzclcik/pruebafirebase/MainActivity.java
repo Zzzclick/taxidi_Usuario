@@ -116,6 +116,10 @@ modificar();
                 }
             }
         };
+        try {
+            Thread.sleep(1500);
+            Toast.makeText(getApplicationContext(),"Corriendo hilo", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {e.printStackTrace();}
     }
 
 
@@ -150,6 +154,9 @@ modificar();
 
             }
         });
+
+
+
     }
 
     public void modificar() {
