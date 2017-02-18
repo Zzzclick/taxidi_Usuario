@@ -1,6 +1,8 @@
 package com.example.zzzclcik.pruebafirebase;
 
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -10,6 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.*;
@@ -36,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int LOCATION_REQUEST_CODE = 1;
     private GoogleMap mMap;
-    private double value1,value2;
+    private double value1, value2;
     DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mensajeRef1 = ref1.child("ubicacion1");
     DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
@@ -56,12 +60,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         */
 
 
-        mAuthListener=new FirebaseAuth.AuthStateListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser()!=null)
-                {
-                    Toast.makeText(MapsActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
+                if (firebaseAuth.getCurrentUser() != null) {
+                    Toast.makeText(MapsActivity.this, "Ya estas logueado " + firebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
 
                     //mAuth.signOut();
                 }
@@ -74,8 +77,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void cargarValues() {
 
 
-
-
         mensajeRef1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -85,11 +86,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"Error value 1", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error value 1", Toast.LENGTH_LONG).show();
             }
         });
-
-
 
 
         mensajeRef2.addValueEventListener(new ValueEventListener() {
@@ -101,21 +100,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"Error value 2", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error value 2", Toast.LENGTH_LONG).show();
             }
         });
 
-        if (value1==0 && value2==0)
-        {
-           try {
-            Thread.sleep(1500);
-               Toast.makeText(getApplicationContext(),"Corriendo hilo", Toast.LENGTH_SHORT).show();
+        if (value1 == 0 && value2 == 0) {
+            try {
+                Thread.sleep(1500);
+                Toast.makeText(getApplicationContext(), "Corriendo hilo", Toast.LENGTH_SHORT).show();
 
-           }catch (InterruptedException e){e.printStackTrace();}
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
 
@@ -131,11 +132,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
+       mMap.getUiSettings().setMyLocationButtonEnabled(true);
+       mMap.getUiSettings().setCompassEnabled(true);
+       mMap.getUiSettings().setZoomControlsEnabled(true);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
 
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(20.1453953, -98.67203239999998), 16));
+                new LatLng(20.1453953, -98.67203239999998), 36));
 
         // You can customize the marker image using images bundled with
         // your app, or dynamically generated bitmaps.
