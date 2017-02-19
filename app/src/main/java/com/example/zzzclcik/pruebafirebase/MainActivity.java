@@ -125,9 +125,9 @@ modificar();
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
-                   // Intent i = new Intent(MainActivity.this, Usuario.class );
-                    //startActivity(i);
-                    //finish();
+                    Intent i = new Intent(MainActivity.this, Usuario.class );
+                    startActivity(i);
+                    finish();
                     //mAuth.signOut();
                 }
             }

@@ -78,7 +78,7 @@ startRegister();
                                     DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
                                     DatabaseReference currentUserBD=mDatabase.child(user_id);
                                     currentUserBD.child("name").setValue(name);
-                                    currentUserBD.child("imagen").setValue("default");
+                                    currentUserBD.child("image").setValue("default");
                                     Intent i = new Intent(Registro.this, MainActivity.class);
                                     startActivity(i);finish();
                                 } else {
