@@ -114,21 +114,9 @@
         android:elevation="10dp"
         android:textSize="17sp"
         android:textStyle="normal|bold"
-        android:layout_above="@+id/textViewBase"
+        android:layout_above="@+id/buttonBase"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="11dp" />
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/infoTextView"
-        android:layout_alignBottom="@+id/buttonGPS"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/buttonGPS"
-        android:layout_toStartOf="@+id/buttonGPS" />
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="match_parent"
@@ -136,7 +124,19 @@
         android:id="@+id/resetClave"
         android:textColor="@android:color/holo_red_dark"
         android:textStyle="normal|bold"
-        android:layout_above="@+id/buttonGPS"
+        android:layout_below="@+id/buttonEnviar"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="11dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/infoTextView"
+        android:layout_alignTop="@+id/buttonGPS"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/buttonGPS"
+        android:layout_toStartOf="@+id/buttonGPS" />
 </RelativeLayout>
