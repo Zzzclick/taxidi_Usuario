@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mensajeEditText;
     private EditText textEmail;
     private EditText textPass;
-    private TextView infoTextView;
+    private TextView infoTextView,resetClave;
     private Button btnRegister;
 
     private ProgressDialog progressDialog;
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         infoTextView = (TextView) findViewById(R.id.infoTextView);
+        mensajeTextView = (TextView) findViewById(R.id.textViewBase);
         mensajeTextView = (TextView) findViewById(R.id.textViewBase);
         mensajeEditText = (EditText) findViewById(R.id.editTextBase);
         progressDialog=new ProgressDialog(this);
