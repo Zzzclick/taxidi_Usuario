@@ -19,7 +19,8 @@
         android:layout_marginTop="22dp"
         android:id="@+id/textView"
         android:textSize="40sp"
-        android:textStyle="normal|bold" />
+        android:textStyle="normal|bold"
+        android:elevation="10dp" />
 
     <EditText
         android:layout_width="match_parent"
@@ -65,7 +66,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="71dp"
         android:id="@+id/buttonRegistrar"
-        android:elevation="0dp"
+        android:elevation="11dp"
         android:textStyle="normal|bold"
         android:background="#FF4081"
         android:textColor="#FFFFFF" />
