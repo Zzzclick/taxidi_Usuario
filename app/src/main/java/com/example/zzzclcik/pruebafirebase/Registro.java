@@ -51,22 +51,28 @@ startRegister();
         final String name=mNameField.getText().toString().trim();
         String email=mEmailField.getText().toString().trim();
         String password=mPasswordField.getText().toString().trim();
-        if(!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password))
-        {
+        if(!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
+            char[] arrayChar = password.toCharArray();
+            if (arrayChar.length > 6)
+            {
+
+
             mProgress.setMessage("Registrando, por favor espere");
             mProgress.show();
-            mAuth.createUserWithEmailAndPassword(email,password)
+            mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             mProgress.dismiss();
-                            if(task.isSuccessful())
-                            {
-                                String user_id=mAuth.getCurrentUser().getUid();
-                                Toast.makeText(Registro.this,user_id,Toast.LENGTH_SHORT).show();
+                            if (task.isSuccessful()) {
+                                String user_id = mAuth.getCurrentUser().getUid();
+                                Toast.makeText(Registro.this, user_id, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(Registro.this, "Datos invalidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-        }
+        }else {Toast.makeText(Registro.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
+        }else{Toast.makeText(Registro.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }
 }

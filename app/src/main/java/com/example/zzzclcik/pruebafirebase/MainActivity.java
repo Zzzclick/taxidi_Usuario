@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         infoTextView = (TextView) findViewById(R.id.infoTextView);
+        resetClave = (TextView) findViewById(R.id.resetClave);
         mensajeTextView = (TextView) findViewById(R.id.textViewBase);
         mensajeTextView = (TextView) findViewById(R.id.textViewBase);
         mensajeEditText = (EditText) findViewById(R.id.editTextBase);
@@ -106,13 +107,22 @@ modificar();
                 startActivity(i);
             }
         });
+        resetClave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.sendPasswordResetEmail(textEmail.getText().toString().trim());
+                Toast.makeText(MainActivity.this,"Correo enviado\nrevisa tu correo",Toast.LENGTH_SHORT).show();
+
+            }
+        });
         mAuthListener=new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
-
+                    Intent i = new Intent(MainActivity.this, MapsActivity.class );
+                    startActivity(i);
                     //mAuth.signOut();
                 }
             }
@@ -186,11 +196,11 @@ modificar();
                     else
                     {
                         Toast.makeText(MainActivity.this,"Logueo fallido",Toast.LENGTH_LONG).show();
-
+                        resetClave.setText("Recuperar contraseña aqui");
                     }
                 }
             });
-        }
+        }else {Toast.makeText(MainActivity.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }
 
 }
