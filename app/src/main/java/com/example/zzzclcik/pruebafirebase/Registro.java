@@ -23,7 +23,7 @@ public class Registro extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private ProgressDialog mProgress;
-
+    private Boolean aux=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,25 +53,29 @@ startRegister();
         String password=mPasswordField.getText().toString().trim();
         if(!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
             char[] arrayChar = password.toCharArray();
-            if (arrayChar.length > 6)
-            {
+            if (arrayChar.length > 6) {
 
+                for (int i = 0; i < arrayChar.length; i++) {
 
-            mProgress.setMessage("Registrando, por favor espere");
-            mProgress.show();
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            mProgress.dismiss();
-                            if (task.isSuccessful()) {
-                                String user_id = mAuth.getCurrentUser().getUid();
-                                Toast.makeText(Registro.this, user_id, Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(Registro.this, "Datos invalidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
+                    if (arrayChar[i] == '@'){Toast.makeText(Registro.this, "Correo valido", Toast.LENGTH_LONG).show();aux = true;}
+                }
+                if (aux) {
+                mProgress.setMessage("Registrando, por favor espere");
+                mProgress.show();
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                mProgress.dismiss();
+                                if (task.isSuccessful()) {
+                                    String user_id = mAuth.getCurrentUser().getUid();
+                                    Toast.makeText(Registro.this, user_id, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(Registro.this, "Datos invalidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
+                        });
+            }else {Toast.makeText(Registro.this,"Correo invalido",Toast.LENGTH_LONG).show();}
         }else {Toast.makeText(Registro.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
         }else{Toast.makeText(Registro.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }

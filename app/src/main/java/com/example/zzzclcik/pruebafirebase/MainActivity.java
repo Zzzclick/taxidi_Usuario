@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText textPass;
     private TextView infoTextView,resetClave;
     private Button btnRegister;
+    private Boolean aux=false;
 
     private ProgressDialog progressDialog;
 
@@ -112,6 +113,7 @@ modificar();
             public void onClick(View view) {
                 mAuth.sendPasswordResetEmail(textEmail.getText().toString().trim());
                 Toast.makeText(MainActivity.this,"Correo enviado\nrevisa tu correo",Toast.LENGTH_SHORT).show();
+                resetClave.setText("");
 
             }
         });
@@ -180,26 +182,36 @@ modificar();
     {
         String email=textEmail.getText().toString().trim();
         String password=textPass.getText().toString().trim();
-        if(!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)){
-        progressDialog.setMessage("Entrando,espere por favor");
-        progressDialog.show();
-            mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    progressDialog.dismiss();
-                    if(task.isSuccessful())
-                    {
-                        Toast.makeText(MainActivity.this,"Logueo correcto",Toast.LENGTH_SHORT).show();
-                        Intent i = new Intent(MainActivity.this, MapsActivity.class );
-                        startActivity(i);
-                    }
-                    else
-                    {
-                        Toast.makeText(MainActivity.this,"Logueo fallido",Toast.LENGTH_LONG).show();
-                        resetClave.setText("Recuperar contraseña aqui");
-                    }
+        if(!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
+
+            char[] arrayChar1 = email.toCharArray();
+            char[] arrayChar2 = password.toCharArray();
+            if (arrayChar2.length > 6) {
+                for (int i = 0; i < arrayChar1.length; i++) {
+
+                    if (arrayChar1[i] == '@'){
+                        Toast.makeText(MainActivity.this, "Correo valido", Toast.LENGTH_LONG).show();aux = true;}
                 }
-            });
+                if (aux==true) {
+
+                progressDialog.setMessage("Entrando,espere por favor");
+                progressDialog.show();
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, "Logueo correcto", Toast.LENGTH_SHORT).show();
+                            Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                            startActivity(i);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Logueo fallido", Toast.LENGTH_LONG).show();
+                            resetClave.setText("Recuperar contraseña aqui");
+                        }
+                    }
+                });
+            }else Toast.makeText(MainActivity.this,"Correo invalido",Toast.LENGTH_LONG).show();
+        }else {Toast.makeText(MainActivity.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
         }else {Toast.makeText(MainActivity.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }
 
