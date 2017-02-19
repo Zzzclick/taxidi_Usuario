@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import android.view.View;
 import android.widget.EditText;
@@ -89,7 +90,7 @@ modificar();
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, Registro.class );
-                startActivity(i);
+                startActivity(i);finish();
             }
         });
 
@@ -105,7 +106,7 @@ modificar();
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, MapsActivity.class );
-                startActivity(i);
+                startActivity(i);finish();
             }
         });
         resetClave.setOnClickListener(new View.OnClickListener() {
@@ -120,11 +121,13 @@ modificar();
         mAuthListener=new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(MainActivity.this, MapsActivity.class );
-                    startActivity(i);
+                   // Intent i = new Intent(MainActivity.this, Usuario.class );
+                    //startActivity(i);
+                    //finish();
                     //mAuth.signOut();
                 }
             }
@@ -186,7 +189,7 @@ modificar();
 
             char[] arrayChar1 = email.toCharArray();
             char[] arrayChar2 = password.toCharArray();
-            if (arrayChar2.length > 6) {
+            if (arrayChar2.length > 5) {
                 for (int i = 0; i < arrayChar1.length; i++) {
 
                     if (arrayChar1[i] == '@'){
@@ -203,7 +206,7 @@ modificar();
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this, "Logueo correcto", Toast.LENGTH_SHORT).show();
                             Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                            startActivity(i);
+                            startActivity(i);finish();
                         } else {
                             Toast.makeText(MainActivity.this, "Logueo fallido", Toast.LENGTH_LONG).show();
                             resetClave.setText("Recuperar contraseña aqui");

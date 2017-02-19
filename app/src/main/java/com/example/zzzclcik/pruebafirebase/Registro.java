@@ -1,6 +1,7 @@
 package com.example.zzzclcik.pruebafirebase;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Registro extends AppCompatActivity {
     private EditText mNameField;
@@ -53,11 +56,13 @@ startRegister();
         String password=mPasswordField.getText().toString().trim();
         if(!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
             char[] arrayChar = password.toCharArray();
-            if (arrayChar.length > 6) {
+            char[] arrayChar2 = email.toCharArray();
 
-                for (int i = 0; i < arrayChar.length; i++) {
+            if (arrayChar.length > 5) {
 
-                    if (arrayChar[i] == '@'){Toast.makeText(Registro.this, "Correo valido", Toast.LENGTH_LONG).show();aux = true;}
+                for (int i = 0; i < arrayChar2.length; i++) {
+
+                    if (arrayChar2[i] == '@'){Toast.makeText(Registro.this, "Correo valido", Toast.LENGTH_LONG).show();aux = true;}
                 }
                 if (aux) {
                 mProgress.setMessage("Registrando, por favor espere");
@@ -70,6 +75,12 @@ startRegister();
                                 if (task.isSuccessful()) {
                                     String user_id = mAuth.getCurrentUser().getUid();
                                     Toast.makeText(Registro.this, user_id, Toast.LENGTH_SHORT).show();
+                                    DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
+                                    DatabaseReference currentUserBD=mDatabase.child(user_id);
+                                    currentUserBD.child("name").setValue(name);
+                                    currentUserBD.child("imagen").setValue("default");
+                                    Intent i = new Intent(Registro.this, MainActivity.class);
+                                    startActivity(i);finish();
                                 } else {
                                     Toast.makeText(Registro.this, "Datos invalidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
                                 }
