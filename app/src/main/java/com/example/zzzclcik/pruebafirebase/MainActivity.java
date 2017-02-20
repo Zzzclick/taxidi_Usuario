@@ -154,6 +154,7 @@ modificar();
 
         mAuth.addAuthStateListener(mAuthListener);
 
+
         mensajeRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
