@@ -31,6 +31,7 @@ public class Registro extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
         setContentView(R.layout.activity_registro);
 
         mAuth=FirebaseAuth.getInstance();
@@ -49,6 +50,13 @@ startRegister();
 });//OnClick BotonRegistrar
 
     }//On create
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_in,R.anim.left_out);
+    }
+
     private void startRegister()
     {
         final String name=mNameField.getText().toString().trim();

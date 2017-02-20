@@ -1,5 +1,6 @@
 package com.example.zzzclcik.pruebafirebase;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -51,6 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
         setContentView(R.layout.activity_maps);
 
         cargarValues();
@@ -72,7 +74,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
 
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_in,R.anim.left_out);
 
+    }
 
     protected void cargarValues() {
 

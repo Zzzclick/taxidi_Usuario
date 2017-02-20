@@ -33,7 +33,7 @@ import java.security.SecureRandom;
 
 public class Usuario extends AppCompatActivity {
     private Button btnLogOut;
-    private ImageView imagePerfil;
+    private ImageView imagePerfil,imagenTaxi;
     private TextView txtName;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -45,10 +45,12 @@ public class Usuario extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
         setContentView(R.layout.activity_usuario);
         txtName= (TextView) findViewById(R.id.txtNombre);
         btnLogOut= (Button) findViewById(R.id.singOut);
         imagePerfil= (ImageView) findViewById(R.id.imageView);
+        imagenTaxi=(ImageView)findViewById(R.id.imageGps);
         mAuth=FirebaseAuth.getInstance();
 
         imagePerfil.setOnClickListener(new View.OnClickListener() {
@@ -94,10 +96,18 @@ public class Usuario extends AppCompatActivity {
 
                         }
                     });
-                }else{ Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i);finish(); }
+                }else{ Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i); }
             }
         };
 
+
+        imagenTaxi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Usuario.this, MapsActivity.class );
+                startActivity(i);
+            }
+        });
     }
     public String getRamdomString()
     {
@@ -110,6 +120,12 @@ public class Usuario extends AppCompatActivity {
         super.onStart();
 
         mAuth.addAuthStateListener(mAuthListener);
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in,R.anim.right_out);
+        this.finish(); // Sale de la aplicación
     }
 
     @Override

@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.right_in,R.anim.right_out);
         setContentView(R.layout.activity_main);
 
         infoTextView = (TextView) findViewById(R.id.infoTextView);
@@ -90,7 +91,8 @@ modificar();
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, Registro.class );
-                startActivity(i);finish();
+                overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                startActivity(i);
             }
         });
 
@@ -105,8 +107,9 @@ modificar();
         botonGps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                overridePendingTransition(R.anim.left_in,R.anim.left_out);
                 Intent i = new Intent(MainActivity.this, MapsActivity.class );
-                startActivity(i);finish();
+                startActivity(i);
             }
         });
         resetClave.setOnClickListener(new View.OnClickListener() {
@@ -126,8 +129,9 @@ modificar();
                 {
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Usuario.class );
-                    startActivity(i);
-                    finish();
+                    overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                    startActivity(i);finish();
+
                     //mAuth.signOut();
                 }
             }
@@ -138,7 +142,12 @@ modificar();
         } catch (InterruptedException e) {e.printStackTrace();}
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in,R.anim.right_out);
+        this.finish();
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -205,8 +214,9 @@ modificar();
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this, "Logueo correcto", Toast.LENGTH_SHORT).show();
-                            Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                            startActivity(i);finish();
+                            overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                            Intent i = new Intent(MainActivity.this, Usuario.class);
+                            startActivity(i);
                         } else {
                             Toast.makeText(MainActivity.this, "Logueo fallido", Toast.LENGTH_LONG).show();
                             resetClave.setText("Recuperar contraseña aqui");
