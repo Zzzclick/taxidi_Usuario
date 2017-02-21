@@ -1,6 +1,7 @@
 package com.example.zzzclcik.pruebafirebase;
 
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -44,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     ArrayList<String>latArray=new ArrayList<>();
     ArrayList<String>lonArray=new ArrayList<>();
+    ArrayList<String>nameArray=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +159,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     System.out.println("aquiiiiiiiiiiiiii222"+lat);
                     latArray.add(lat);
                     lonArray.add(lon);
+
                 }
 
 
@@ -189,9 +192,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
+        String latitud2 = getIntent().getStringExtra("latitud");
+        String longitud2 = getIntent().getStringExtra("Longitud");
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(20.1453953, -98.67203239999998), 36));
+        if (!latitud2.equals("(desconocida)") || !longitud2.equals("(desconocida)"))
+        {
+        final double latA, lonA;
+        latA = Double.parseDouble(latitud2);
+        lonA = Double.parseDouble(longitud2);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
+        }
 
         // You can customize the marker image using images bundled with
         // your app, or dynamically generated bitmaps.
@@ -234,31 +244,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
-                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_SHORT).show();
 
                 //entris.clear();
+                latArray.clear();
+                lonArray.clear();
+                nameArray.clear();
                 while (items.hasNext())
                 {
                     DataSnapshot item=items.next();
-                    String lat,lon;
+                    String lat,lon,nombreIten;
                     lat=item.child("latitud").getValue().toString();
                     lon=item.child("longitud").getValue().toString();
+                    nombreIten=item.child("name").getValue().toString();
                     System.out.println("aquiiiiiiiiiiiiii222"+lat);
                     latArray.add(lat);
                     lonArray.add(lon);
+                    nameArray.add(nombreIten);
 
                     for (int x=0;x<latArray.size();x++)
                     {
-                        System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
+                        System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x)+"NOMBRE"+nombreIten);
                         String latAux,lonAux="0";
                         double aux1,aux2;
+                        String aux3;
+                        if(!latArray.get(x).isEmpty()||!latArray.get(x).equals("")||!lonArray.get(x).isEmpty()||!lonArray.get(x).equals(""))
+                        {
                         aux1=Double.parseDouble(latArray.get(x));
                         aux2=Double.parseDouble(lonArray.get(x));
+                        aux3=nameArray.get(x);
 
                         mMap.addMarker(new MarkerOptions()
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
                                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                                .title(aux3)
                                 .position(new LatLng(aux1,aux2)));
+                        }else {Toast.makeText(getApplicationContext(), "Cnversion de dobles", Toast.LENGTH_LONG).show();}
                     }
                 }
 
@@ -281,7 +302,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
         }
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+
+        //////Para crear marcador con un click largo
+        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions()
@@ -290,12 +313,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .position(latLng));
 
             }
-        });
+        });*/
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 Toast.makeText(getApplicationContext(), "Has pulsado una marca", Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(MapsActivity.this, DetalleTaxis.class );
+                i.putExtra("nombre",marker.getTitle());
+                i.putExtra("posicion",marker.getPosition());
+
+                startActivity(i);
                 return false;
             }
         });

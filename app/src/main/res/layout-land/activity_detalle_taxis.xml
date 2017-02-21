@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_detalle_taxis"
     android:layout_width="match_parent"
@@ -9,5 +10,83 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.zzzclcik.pruebafirebase.DetalleTaxis">
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/latTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView7"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:layout_alignRight="@+id/latTextView"
+        android:layout_alignEnd="@+id/latTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/lonTextView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/textView8"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:srcCompat="@drawable/perfil"
+        android:id="@+id/imageView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:elevation="10dp"
+        android:layout_below="@+id/textView4" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:id="@+id/latTextView"
+        android:textAlignment="center"
+        android:textStyle="normal|bold"
+        android:textSize="20sp"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:id="@+id/lonTextView"
+        android:textAlignment="center"
+        android:textStyle="normal|bold"
+        android:textSize="20sp"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:id="@+id/ratingBar"
+        android:layout_below="@+id/textView7"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Nombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/textView4"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:elevation="11dp"
+        android:textStyle="normal|bold" />
 
 </RelativeLayout>

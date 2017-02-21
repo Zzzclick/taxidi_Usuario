@@ -11,11 +11,94 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.zzzclcik.pruebafirebase.DetalleTaxis">
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/latTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView7"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/lonTextView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/textView8"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="83dp"
+        android:id="@+id/ratingBarTaxis"
+        android:layout_below="@+id/textView7"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:id="@+id/latTextView"
+        android:textAlignment="center"
+        android:textStyle="normal|bold"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:id="@+id/lonTextView"
+        android:textAlignment="center"
+        android:textStyle="normal|bold"
+        android:layout_alignBaseline="@+id/latTextView"
+        android:layout_alignBottom="@+id/latTextView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="20sp" />
+
+    <TextView
+        android:text="Nombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/NombreTextView"
+        android:textStyle="normal|bold"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:elevation="11dp" />
+
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:srcCompat="@mipmap/ic_launcher"
+        android:layout_height="300dp"
+        app:srcCompat="@drawable/perfil"
         android:id="@+id/imageView2"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:elevation="10dp"
+        android:layout_below="@+id/NombreTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="26dp"
+        android:id="@+id/PosiciontextView"
+        android:layout_below="@+id/textView7"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
 </RelativeLayout>

@@ -62,6 +62,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     private DatabaseReference mDatabase;
     private static final String LOGTAG = "android-localizacion";
     AlertDialog alert = null;
+    public String latAux,lonAux="0";
 
     private static final int PETICION_PERMISO_LOCALIZACION = 101;
 
@@ -151,6 +152,8 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(Usuario.this, MapsActivity.class );
+                i.putExtra("latitud",latAux);
+                i.putExtra("Longitud",lonAux);
                 startActivity(i);
             }
         });
@@ -172,6 +175,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
+                latAux=value;
                 lblLatitud.setText("Latitud:"+value);
             }
 
@@ -184,6 +188,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
+                lonAux=value;
                 lblLongitud.setText("Longitud:"+value);
             }
 

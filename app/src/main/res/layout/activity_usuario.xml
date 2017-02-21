@@ -62,7 +62,7 @@
         android:layout_below="@+id/textView3"
         android:layout_above="@+id/imageGps"
         android:layout_centerInParent="true"
-        app:srcCompat="@android:drawable/ic_lock_lock" />
+        app:srcCompat="@drawable/perfil" />
 
     <TextView
         android:text="Da click sobre el taxi para ver taxis cercanos"
