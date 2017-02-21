@@ -2,12 +2,15 @@ package com.example.zzzclcik.pruebafirebase;
 
 import android.*;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -58,11 +61,12 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private static final String LOGTAG = "android-localizacion";
+    AlertDialog alert = null;
 
     private static final int PETICION_PERMISO_LOCALIZACION = 101;
 
     private GoogleApiClient apiClient;
-
+    LocationManager locationManager;
 
 
     @Override
@@ -77,14 +81,20 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
        lblLongitud=(TextView)findViewById(R.id.idLongitud);
        lblLatitud=(TextView)findViewById(R.id.idLatitud);
         mAuth=FirebaseAuth.getInstance();
-
+        //imagePerfil.setImageDrawable(roundedDrawable);
 
         apiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+        /****Mejora****/
+        if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            AlertNoGps();
+        }
+        /********/
         imagePerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,8 +109,12 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         });
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-            if(mAuth.getCurrentUser().getUid()!=null) { mAuth.signOut(); }
+            public void onClick(View view)
+            {
+                if(mAuth.getCurrentUser().getUid()!=null)
+                 {
+                  mAuth.signOut(); Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i);finish();
+                 }
             }
         });
         progressDialog=new ProgressDialog(this);
@@ -128,7 +142,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 
                         }
                     });
-                }else{ Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i); }
+                }else{ Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i);finish(); }
             }
         };
 
@@ -183,8 +197,35 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.right_in,R.anim.right_out);
+        overridePendingTransition(R.anim.left_in,R.anim.left_out);
         this.finish(); // Sale de la aplicación
+    }
+
+    private void AlertNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if(alert != null)
+        {
+            alert.dismiss ();
+        }
     }
 
     @Override

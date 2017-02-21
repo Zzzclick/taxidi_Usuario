@@ -55,6 +55,7 @@ startRegister();
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.left_in,R.anim.left_out);
+        finish();
     }
 
     private void startRegister()

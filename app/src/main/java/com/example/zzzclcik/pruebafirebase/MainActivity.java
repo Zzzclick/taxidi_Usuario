@@ -10,16 +10,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 import android.widget.Button;
 import android.content.Intent;
 import android.widget.Toast;
@@ -54,38 +52,26 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.right_in,R.anim.right_out);
         setContentView(R.layout.activity_main);
 
-        infoTextView = (TextView) findViewById(R.id.infoTextView);
+
         resetClave = (TextView) findViewById(R.id.resetClave);
-        mensajeTextView = (TextView) findViewById(R.id.textViewBase);
-        mensajeTextView = (TextView) findViewById(R.id.textViewBase);
-        mensajeEditText = (EditText) findViewById(R.id.editTextBase);
+
+
         progressDialog=new ProgressDialog(this);
         textEmail=(EditText)findViewById(R.id.editTextEmail);
         textPass=(EditText)findViewById(R.id.editTextClave);
         btnRegister=(Button)findViewById(R.id.buttonEntrar);
         mAuth=FirebaseAuth.getInstance();
 
-        Button boton1 = (Button)findViewById(R.id.buttonBase);
-        Button botonEnviar=(Button)findViewById(R.id.buttonEnviar);
-        Button botonGps=(Button)findViewById(R.id.buttonGPS);
 
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                String value = getIntent().getExtras().getString(key);
-                infoTextView.append("\n" + key + ": " + value);
-            }
-        }
+        Button botonEnviar=(Button)findViewById(R.id.buttonRegistro);
+
+
+
 
         String token = FirebaseInstanceId.getInstance().getToken();
 
         Log.d(TAG, "Token: " + token);
 
-        boton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-modificar();
-            }
-        });
 
         botonEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +81,6 @@ modificar();
                 startActivity(i);
             }
         });
-
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -104,14 +89,7 @@ modificar();
 
             }
         });
-        botonGps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                overridePendingTransition(R.anim.left_in,R.anim.left_out);
-                Intent i = new Intent(MainActivity.this, MapsActivity.class );
-                startActivity(i);
-            }
-        });
+
         resetClave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +112,7 @@ modificar();
 
                     //mAuth.signOut();
                 }
+
             }
         };
         try {
@@ -145,44 +124,14 @@ modificar();
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.right_in,R.anim.right_out);
+        overridePendingTransition(R.anim.left_in,R.anim.left_out);
         this.finish();
     }
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
-
         mAuth.addAuthStateListener(mAuthListener);
-
-
-        mensajeRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = dataSnapshot.getValue(String.class);
-                mensajeTextView.setText("En la base esta:"+value);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        mensajeRef2.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = dataSnapshot.getValue(String.class);
-               double aux= Double.parseDouble(value);
-                infoTextView.setText("Ubicación:"+aux);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
     }
 
     public void modificar() {

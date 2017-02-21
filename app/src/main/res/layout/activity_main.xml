@@ -10,33 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.zzzclcik.pruebafirebase.MainActivity">
 
-    <Button
-        android:text="Enviar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignTop="@+id/editTextBase"
-        android:layout_alignRight="@+id/editTextBase"
-        android:layout_alignEnd="@+id/editTextBase"
-        android:layout_marginTop="42dp"
-        android:id="@+id/buttonBase"
-        tools:text="Enviar"
-        android:elevation="0dp"
-        android:textColor="#FFFFFF"
-        android:background="#FF4081"
-        android:textStyle="normal|bold" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:layout_marginBottom="56dp"
-        android:id="@+id/editTextBase"
-        android:hint="Escribe aqui"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,48 +20,6 @@
         android:layout_alignParentStart="true"
         android:id="@+id/editTextEmail"
         android:hint="Correo electrónico" />
-
-    <Button
-        android:text="Iniciar sesion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonEntrar"
-        android:background="#FF4081"
-        android:textColor="#FFFFFF"
-        android:elevation="10dp"
-        android:textStyle="normal|bold"
-        android:textSize="18sp"
-        android:layout_below="@+id/editTextClave"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="18dp" />
-
-    <Button
-        android:text="GPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonBase"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/buttonGPS"
-        android:background="#FF4081"
-        android:textColor="#FFFFFF"
-        android:elevation="0dp" />
-
-    <Button
-        android:text="Registrarse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonEnviar"
-        android:background="#FF4081"
-        android:textColor="#FFFFFF"
-        android:elevation="10dp"
-        android:textStyle="normal|bold"
-        android:textSize="18sp"
-        android:layout_marginTop="11dp"
-        android:layout_below="@+id/buttonEntrar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="match_parent"
@@ -102,35 +33,44 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView
-        android:text="TextView"
+    <Button
+        android:text="Iniciar sesion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewBase"
-        android:layout_above="@+id/buttonGPS"
+        android:id="@+id/buttonEntrar"
+        android:background="#FF4081"
+        android:textColor="#FFFFFF"
+        android:elevation="10dp"
+        android:textStyle="normal|bold"
+        android:textSize="18sp"
+        android:layout_below="@+id/resetClave"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="22dp" />
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/infoTextView"
-        android:layout_alignBottom="@+id/textViewBase"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="31dp" />
+        android:layout_marginTop="11dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="11dp"
-        android:layout_marginStart="11dp"
         android:id="@+id/resetClave"
         android:textColor="@android:color/holo_red_dark"
-        android:textStyle="normal|bold" />
+        android:textStyle="normal|bold"
+        android:layout_marginTop="18dp"
+        android:layout_below="@+id/editTextClave"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Registrarse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonRegistro"
+        android:background="#FF4081"
+        android:textColor="#FFFFFF"
+        android:elevation="10dp"
+        android:textStyle="normal|bold"
+        android:textSize="18sp"
+        android:layout_below="@+id/buttonEntrar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="27dp" />
 </RelativeLayout>

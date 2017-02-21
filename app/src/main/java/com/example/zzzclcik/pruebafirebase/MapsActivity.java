@@ -1,6 +1,6 @@
 package com.example.zzzclcik.pruebafirebase;
 
-import android.content.Intent;
+
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -14,28 +14,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.auth.AuthResult;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -48,10 +40,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     DatabaseReference mensajeRef2 = ref2.child("ubicacion2");
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference mDatabase;
+
+    ArrayList<String>latArray=new ArrayList<>();
+    ArrayList<String>lonArray=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDatabase= FirebaseDatabase.getInstance().getReference();
+
         overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
         setContentView(R.layout.activity_maps);
 
@@ -81,8 +80,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    protected void cargarValues() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        latArray.clear();
+        lonArray.clear();
+    }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        getUser();
+    }
+
+    protected void cargarValues() {
+/*
 
         mensajeRef1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -109,7 +122,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(getApplicationContext(), "Error value 2", Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
 
         if (value1 == 0 && value2 == 0) {
             try {
@@ -123,6 +136,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+    }
+    private  void getUser()
+    {
+        mDatabase.child("taxis").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
+                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_LONG).show();
+
+                //entris.clear();
+                while (items.hasNext())
+                {
+                DataSnapshot item=items.next();
+                    String lat,lon;
+                    lat=item.child("latitud").getValue().toString();
+                    lon=item.child("longitud").getValue().toString();
+                    System.out.println("aquiiiiiiiiiiiiii222"+lat);
+                    latArray.add(lat);
+                    lonArray.add(lon);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });//
+
 
     }
 
@@ -173,15 +218,69 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(value1 + 0.00003, value2 - 0.00003)));
-        System.out.println(value1 + 0.00003 + "    aqui   " + value2 + 0.00003);
+                .position(new LatLng(20.1453953, -98.66203239999998)));
+        System.out.println(20.1453953 + "    aqui   " + value2 + 0.00003);
 
 
 /*              mMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                 .position(new LatLng(20.1453953, -98.66203239999998)));
-*/
+                */
+        //////////////////////////////////////7
+
+        mDatabase.child("taxis").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
+                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_LONG).show();
+
+                //entris.clear();
+                while (items.hasNext())
+                {
+                    DataSnapshot item=items.next();
+                    String lat,lon;
+                    lat=item.child("latitud").getValue().toString();
+                    lon=item.child("longitud").getValue().toString();
+                    System.out.println("aquiiiiiiiiiiiiii222"+lat);
+                    latArray.add(lat);
+                    lonArray.add(lon);
+
+                    for (int x=0;x<latArray.size();x++)
+                    {
+                        System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
+                        String latAux,lonAux="0";
+                        double aux1,aux2;
+                        aux1=Double.parseDouble(latArray.get(x));
+                        aux2=Double.parseDouble(lonArray.get(x));
+
+                        mMap.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                                .position(new LatLng(aux1,aux2)));
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });//
+
+
+        ///////////////////////////////////////7
+
+
+
+        System.out.println(latArray.size()+"     111!!1!!!111");
+        for (int x=0;x<latArray.size();x++)
+        {
+            System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
+        }
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
@@ -196,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(), "Has pulsado una marca", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Has pulsado una marca", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
