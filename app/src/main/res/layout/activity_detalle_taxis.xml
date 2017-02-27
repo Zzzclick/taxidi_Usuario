@@ -12,7 +12,6 @@
     tools:context="com.example.zzzclcik.pruebafirebase.DetalleTaxis">
 
     <TextView
-        android:text="TextView"
         android:layout_width="170dp"
         android:layout_height="20dp"
         android:layout_below="@+id/latTextView"
@@ -23,7 +22,6 @@
         android:textSize="18sp" />
 
     <TextView
-        android:text="TextView"
         android:layout_width="170dp"
         android:layout_height="20dp"
         android:layout_below="@+id/lonTextView"
@@ -42,20 +40,20 @@
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="Latitud"
         android:layout_width="170dp"
         android:layout_height="20dp"
         android:id="@+id/latTextView"
         android:textAlignment="center"
         android:textStyle="normal|bold"
-        android:layout_below="@+id/imageView2"
+        android:layout_below="@+id/PerfilimageView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="20dp"
         android:textSize="20sp" />
 
     <TextView
-        android:text="TextView"
+        android:text="Longuitud"
         android:layout_width="170dp"
         android:layout_height="20dp"
         android:id="@+id/lonTextView"
@@ -83,14 +81,14 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         app:srcCompat="@drawable/perfil"
-        android:id="@+id/imageView2"
+        android:id="@+id/PerfilimageView"
         android:elevation="10dp"
         android:layout_below="@+id/NombreTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="Num de placas:"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="26dp"
@@ -99,6 +97,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textAlignment="center"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textStyle="normal|bold" />
 
 </RelativeLayout>

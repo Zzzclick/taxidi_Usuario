@@ -52,10 +52,8 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.right_in,R.anim.right_out);
         setContentView(R.layout.activity_main);
 
-
+        FirebaseInstanceId.getInstance().getToken();
         resetClave = (TextView) findViewById(R.id.resetClave);
-
-
         progressDialog=new ProgressDialog(this);
         textEmail=(EditText)findViewById(R.id.editTextEmail);
         textPass=(EditText)findViewById(R.id.editTextClave);

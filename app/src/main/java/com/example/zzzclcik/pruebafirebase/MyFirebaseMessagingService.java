@@ -21,9 +21,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public static final String TAG = "NOTICIAS";
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
+    showNotification(remoteMessage.getData().get("message"));
 
-        String from = remoteMessage.getFrom();
+     /*   String from = remoteMessage.getFrom();
         Log.d(TAG, "Mensaje recibido de: " + from);
 
         if (remoteMessage.getNotification() != null) {
@@ -34,28 +34,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Data: " + remoteMessage.getData());
-        }
+        }*/
 
     }
 
-    private void mostrarNotificacion(String title, String body) {
+    private void showNotification(String message) {
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.taxi)
-                .setContentTitle(title)
-                .setContentText(body)
+                .setContentTitle("FCM Test")
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(soundUri)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, notificationBuilder.build());
+    }
+
+    private void mostrarNotificacion(String title, String body) {
+
+
+
+
+
+
 
     }
 }

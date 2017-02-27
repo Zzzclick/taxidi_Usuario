@@ -17,6 +17,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class Registro extends AppCompatActivity {
     private EditText mNameField;
@@ -88,6 +89,8 @@ startRegister();
                                     DatabaseReference currentUserBD=mDatabase.child(user_id);
                                     currentUserBD.child("name").setValue(name);
                                     currentUserBD.child("image").setValue("default");
+                                    String token = FirebaseInstanceId.getInstance().getToken();
+                                    currentUserBD.child("image").setValue(token);
                                     Intent i = new Intent(Registro.this, MainActivity.class);
                                     startActivity(i);finish();
                                 } else {

@@ -46,7 +46,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-
+import java.util.StringTokenizer;
 
 
 public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
@@ -157,6 +157,21 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                 startActivity(i);
             }
         });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        String frase = "having Community Portal|Help Desk|Local Embassy|Reference Desk|Site News";
+        StringTokenizer st = new StringTokenizer(frase, "|");
+        String community = st.nextToken();
+        String helpDesk = st.nextToken();
+        String localEmbassy = st.nextToken();
+        String referenceDesk = st.nextToken();
+        String siteNews = st.nextToken();
+        System.out.println("Comidad  "+community);
+        System.out.println("Help     "+helpDesk);
+        System.out.println("Local    "+localEmbassy);
+        System.out.println("Refencia "+referenceDesk);
+        System.out.println("Sitio    "+siteNews);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
     public String getRamdomString()
     {

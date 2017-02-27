@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<String>latArray=new ArrayList<>();
     ArrayList<String>lonArray=new ArrayList<>();
     ArrayList<String>nameArray=new ArrayList<>();
+    ArrayList<String>fotoArray=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart()
     {
         super.onStart();
-        getUser();
+
     }
 
     protected void cargarValues() {
@@ -140,39 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
     }
-    private  void getUser()
-    {
-        mDatabase.child("taxis").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
-                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_LONG).show();
 
-                //entris.clear();
-                while (items.hasNext())
-                {
-                DataSnapshot item=items.next();
-                    String lat,lon;
-                    lat=item.child("latitud").getValue().toString();
-                    lon=item.child("longitud").getValue().toString();
-                    System.out.println("aquiiiiiiiiiiiiii222"+lat);
-                    latArray.add(lat);
-                    lonArray.add(lon);
-
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });//
-
-
-    }
 
 
     /**
@@ -191,45 +161,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        String latitud2 = "null1";
+        String longitud2 = "null1";
 
-        String latitud2 = getIntent().getStringExtra("latitud");
-        String longitud2 = getIntent().getStringExtra("Longitud");
-
-        if (!latitud2.equals("(desconocida)") || !longitud2.equals("(desconocida)"))
+         latitud2 = getIntent().getStringExtra("latitud");
+        longitud2 = getIntent().getStringExtra("Longitud");
+        System.out.println("11111111"+latitud2+"222222"+longitud2);
+        if (latitud2!=null || longitud2!=null)
         {
         final double latA, lonA;
         latA = Double.parseDouble(latitud2);
         lonA = Double.parseDouble(longitud2);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
+        }else{                Toast.makeText(getApplicationContext(), "No entro", Toast.LENGTH_SHORT).show();
         }
 
         // You can customize the marker image using images bundled with
         // your app, or dynamically generated bitmaps.
         //while (value1 == 0 && value2 == 0) {        }
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(value1, value2)));
-        System.out.println(value1 + "    aqui   " + value2);
 
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(value1 + 0.00001, value2 - 0.00001)));
-        System.out.println(value1 + 0.00001 + "    aqui   " + value2 + 0.00001);
-
-
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(value1 + 0.00002, value2 - 0.00002)));
-        System.out.println(value1 + 0.00002 + "    aqui   " + value2 + 0.00002);
-
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(20.1453953, -98.66203239999998)));
-        System.out.println(20.1453953 + "    aqui   " + value2 + 0.00003);
 
 
 /*              mMap.addMarker(new MarkerOptions()
@@ -253,31 +203,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 while (items.hasNext())
                 {
                     DataSnapshot item=items.next();
-                    String lat,lon,nombreIten;
+                    String lat,lon,nombreIten,foto;
                     lat=item.child("latitud").getValue().toString();
                     lon=item.child("longitud").getValue().toString();
                     nombreIten=item.child("name").getValue().toString();
-                    System.out.println("aquiiiiiiiiiiiiii222"+lat);
+                    foto=item.child("image").getValue().toString();
                     latArray.add(lat);
                     lonArray.add(lon);
                     nameArray.add(nombreIten);
+                    fotoArray.add(foto);
 
                     for (int x=0;x<latArray.size();x++)
                     {
-                        System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x)+"NOMBRE"+nombreIten);
+                        System.out.println("Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
+                        System.out.println("NOMBRE:"+nameArray.get(x));
+                        System.out.println("Imagen:"+fotoArray.get(x));
                         String latAux,lonAux="0";
                         double aux1,aux2;
-                        String aux3;
-                        if(!latArray.get(x).isEmpty()||!latArray.get(x).equals("")||!lonArray.get(x).isEmpty()||!lonArray.get(x).equals(""))
+                        String aux3,aux4;
+                        String token = FirebaseInstanceId.getInstance().getToken();
+                        if(!latArray.get(x).isEmpty()||!latArray.get(x).equals("")||latArray.get(x)!=null||!lonArray.get(x).isEmpty()||!lonArray.get(x).equals("")||lonArray.get(x)!=null)
                         {
                         aux1=Double.parseDouble(latArray.get(x));
                         aux2=Double.parseDouble(lonArray.get(x));
                         aux3=nameArray.get(x);
-
+                        aux4=fotoArray.get(x);
+                        if(aux3!=null||aux3!=null)
                         mMap.addMarker(new MarkerOptions()
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
                                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                                 .title(aux3)
+                                .snippet(aux4+"|")
                                 .position(new LatLng(aux1,aux2)));
                         }else {Toast.makeText(getApplicationContext(), "Cnversion de dobles", Toast.LENGTH_LONG).show();}
                     }
@@ -297,10 +253,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-        System.out.println(latArray.size()+"     111!!1!!!111");
+        System.out.println(latArray.size()+"     Tamaño del arreglo de latitud");
         for (int x=0;x<latArray.size();x++)
         {
-            System.out.println("11!! Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
+            System.out.println("Si esta imprimiendo Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
         }
 
         //////Para crear marcador con un click largo
@@ -323,6 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent i = new Intent(MapsActivity.this, DetalleTaxis.class );
                 i.putExtra("nombre",marker.getTitle());
                 i.putExtra("posicion",marker.getPosition());
+                i.putExtra("foto",marker.getSnippet());
 
                 startActivity(i);
                 return false;
