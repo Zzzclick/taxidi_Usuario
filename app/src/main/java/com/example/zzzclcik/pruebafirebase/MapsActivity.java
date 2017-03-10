@@ -3,6 +3,8 @@ package com.example.zzzclcik.pruebafirebase;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -43,16 +46,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
+    public String idUsusario;
 
+    ArrayList<String>idArray=new ArrayList<>();
     ArrayList<String>latArray=new ArrayList<>();
     ArrayList<String>lonArray=new ArrayList<>();
     ArrayList<String>nameArray=new ArrayList<>();
     ArrayList<String>fotoArray=new ArrayList<>();
+    ArrayList<String>placasArray=new ArrayList<>();
+    ArrayList<String>estadosArray=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        idUsusario=getIntent().getStringExtra("idUsuario");
         mDatabase= FirebaseDatabase.getInstance().getReference();
 
         overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
@@ -75,13 +82,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         };
-
+ConexionInternet();
     }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.left_in,R.anim.left_out);
-
     }
 
     @Override
@@ -130,7 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (value1 == 0 && value2 == 0) {
             try {
-                Thread.sleep(1500);
+                Thread.sleep(0000);
                 Toast.makeText(getApplicationContext(), "Corriendo hilo", Toast.LENGTH_SHORT).show();
 
             } catch (InterruptedException e) {
@@ -167,14 +173,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          latitud2 = getIntent().getStringExtra("latitud");
         longitud2 = getIntent().getStringExtra("Longitud");
         System.out.println("11111111"+latitud2+"222222"+longitud2);
-        if (latitud2!=null || longitud2!=null)
+        if (latitud2!=null || longitud2!=null||!latitud2.equals("desconocida")||!longitud2.equals("desconocida"))
         {
         final double latA, lonA;
-        latA = Double.parseDouble(latitud2);
-        lonA = Double.parseDouble(longitud2);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
-        }else{                Toast.makeText(getApplicationContext(), "No entro", Toast.LENGTH_SHORT).show();
-        }
+            try
+            {
+                latA = Double.parseDouble(latitud2);
+                lonA = Double.parseDouble(longitud2);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
+            }catch (NumberFormatException ex)
+            {
+                Toast.makeText(getApplicationContext(), "Latitud y longitud no son números", Toast.LENGTH_SHORT).show();
+            }
+        }else{ Toast.makeText(getApplicationContext(), "No entro", Toast.LENGTH_SHORT).show(); }
 
         // You can customize the marker image using images bundled with
         // your app, or dynamically generated bitmaps.
@@ -197,45 +208,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_SHORT).show();
 
                 //entris.clear();
+                idArray.clear();
                 latArray.clear();
                 lonArray.clear();
                 nameArray.clear();
+                fotoArray.clear();
+                placasArray.clear();
+                estadosArray.clear();
                 while (items.hasNext())
                 {
                     DataSnapshot item=items.next();
-                    String lat,lon,nombreIten,foto;
+                    String id,lat,lon,nombreIten,foto,placa,estado;
+                    id=item.child("id").getValue().toString();
                     lat=item.child("latitud").getValue().toString();
                     lon=item.child("longitud").getValue().toString();
                     nombreIten=item.child("name").getValue().toString();
                     foto=item.child("image").getValue().toString();
+                    placa=item.child("placas").getValue().toString();
+                    estado=item.child("estado").getValue().toString();
+                    idArray.add(id);
                     latArray.add(lat);
                     lonArray.add(lon);
                     nameArray.add(nombreIten);
                     fotoArray.add(foto);
+                    placasArray.add(placa);
+                    estadosArray.add(estado);
 
-                    for (int x=0;x<latArray.size();x++)
-                    {
-                        System.out.println("Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
-                        System.out.println("NOMBRE:"+nameArray.get(x));
-                        System.out.println("Imagen:"+fotoArray.get(x));
-                        String latAux,lonAux="0";
-                        double aux1,aux2;
-                        String aux3,aux4;
+                    for (int x=0;x<latArray.size();x++) {
+                        System.out.println("id" + idArray.get(x));
+                        System.out.println("Latitud:" + latArray.get(x) + " Longitud:" + lonArray.get(x));
+                        System.out.println("NOMBRE:" + nameArray.get(x));
+                        System.out.println("Imagen:" + fotoArray.get(x));
+                        System.out.println("Placas:" + placasArray.get(x));
+                        System.out.println("Estados:" + placasArray.get(x));
+                        String latAux, lonAux = "0";
+                        double aux1, aux2;
+                        String aux3, aux4, aux5, aux6;
                         String token = FirebaseInstanceId.getInstance().getToken();
-                        if(!latArray.get(x).isEmpty()||!latArray.get(x).equals("")||latArray.get(x)!=null||!lonArray.get(x).isEmpty()||!lonArray.get(x).equals("")||lonArray.get(x)!=null)
+                        if (estadosArray.get(x).equals("0"))
                         {
-                        aux1=Double.parseDouble(latArray.get(x));
-                        aux2=Double.parseDouble(lonArray.get(x));
-                        aux3=nameArray.get(x);
-                        aux4=fotoArray.get(x);
-                        if(aux3!=null||aux3!=null)
-                        mMap.addMarker(new MarkerOptions()
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                                .title(aux3)
-                                .snippet(aux4+"|")
-                                .position(new LatLng(aux1,aux2)));
-                        }else {Toast.makeText(getApplicationContext(), "Cnversion de dobles", Toast.LENGTH_LONG).show();}
+                        if (!latArray.get(x).isEmpty() || !latArray.get(x).equals("") || latArray.get(x) != null || !lonArray.get(x).isEmpty() || !lonArray.get(x).equals("") || lonArray.get(x) != null) {
+                            try {
+                                aux1 = Double.parseDouble(latArray.get(x));
+                                aux2 = Double.parseDouble(lonArray.get(x));
+                                aux3 = nameArray.get(x);
+                                aux4 = fotoArray.get(x);
+                                aux5 = placasArray.get(x);
+                                aux6 = idArray.get(x);
+                                if (aux3 != null || aux3 != null)
+                                    mMap.addMarker(new MarkerOptions()
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                                            .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                                            .title(aux3)
+                                            .snippet(aux4 + "|" + aux5 + "|" + aux6)
+                                            .position(new LatLng(aux1, aux2)));
+                            } catch (NumberFormatException ex) {
+                                Toast.makeText(getApplicationContext(), "Conversion de dobles", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Conversion de dobles", Toast.LENGTH_LONG).show();
+                        }
+                    }
                     }
                 }
 
@@ -271,6 +304,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });*/
 
+
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -280,11 +314,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 i.putExtra("nombre",marker.getTitle());
                 i.putExtra("posicion",marker.getPosition());
                 i.putExtra("foto",marker.getSnippet());
+                i.putExtra("idUsuario",idUsusario);
 
                 startActivity(i);
                 return false;
             }
         });
+
+
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -298,5 +335,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
         System.out.println("!!!!!!!!!!prueba "+mMap.isMyLocationEnabled());
+    }
+    public boolean ConexionInternet()
+    {
+        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
+        {
+            return true;
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Conexión a Internet");
+            builder.setMessage("No estás conectado a Internet");
+            builder.setPositiveButton("Aceptar",null);
+            builder.show();
+            return false;
+        }
     }
 }

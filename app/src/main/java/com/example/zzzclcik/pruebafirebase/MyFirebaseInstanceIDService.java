@@ -26,7 +26,7 @@ import okhttp3.RequestBody;
  * Created by Zzzclcik on 24/02/2017.
  */
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService
-{
+{/*
     @Override
     public void onTokenRefresh() {
         String token= FirebaseInstanceId.getInstance().getToken();
@@ -45,5 +45,5 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService
             System.out.println("aqui888888888"+ e);
         }
 
-    }
+    }*/
 }

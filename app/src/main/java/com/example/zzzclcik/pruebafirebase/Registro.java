@@ -2,7 +2,10 @@ package com.example.zzzclcik.pruebafirebase;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -46,7 +49,10 @@ public class Registro extends AppCompatActivity {
 mRegistrerButton.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-startRegister();
+        if (ConexionInternet())
+        {
+            startRegister();
+        }
     }
 });//OnClick BotonRegistrar
 
@@ -62,7 +68,7 @@ startRegister();
     private void startRegister()
     {
         final String name=mNameField.getText().toString().trim();
-        String email=mEmailField.getText().toString().trim();
+        final String email=mEmailField.getText().toString().trim();
         String password=mPasswordField.getText().toString().trim();
         if(!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
             char[] arrayChar = password.toCharArray();
@@ -88,18 +94,43 @@ startRegister();
                                     DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
                                     DatabaseReference currentUserBD=mDatabase.child(user_id);
                                     currentUserBD.child("name").setValue(name);
+                                    currentUserBD.child("email").setValue(email);
+                                    currentUserBD.child("estado").setValue("0");
                                     currentUserBD.child("image").setValue("default");
-                                    String token = FirebaseInstanceId.getInstance().getToken();
-                                    currentUserBD.child("image").setValue(token);
+                                    currentUserBD.child("peticion").setValue("nada");
+
                                     Intent i = new Intent(Registro.this, MainActivity.class);
                                     startActivity(i);finish();
                                 } else {
-                                    Toast.makeText(Registro.this, "Datos invalidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Registro.this, "Datos inválidos\nrevisa tus datos", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
-            }else {Toast.makeText(Registro.this,"Correo invalido",Toast.LENGTH_LONG).show();}
-        }else {Toast.makeText(Registro.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
+            }else {Toast.makeText(Registro.this,"Correo inválido",Toast.LENGTH_LONG).show();}
+        }else {Toast.makeText(Registro.this,"La contraseña debe tener mínimo 6 dígitos",Toast.LENGTH_LONG).show();}
         }else{Toast.makeText(Registro.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }
+
+
+    public boolean ConexionInternet()
+    {
+        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
+        {
+            return true;
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Conexión a Internet");
+            builder.setMessage("No estás conectado a Internet");
+            builder.setPositiveButton("Aceptar",null);
+            builder.show();
+            return false;
+        }
+    }//
+
 }

@@ -1,7 +1,10 @@
 package com.example.zzzclcik.pruebafirebase;
 
 import android.app.ProgressDialog;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView infoTextView,resetClave;
     private Button btnRegister;
     private Boolean aux=false;
+    public String idUsuario;
 
     private ProgressDialog progressDialog;
 
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseInstanceId.getInstance().getToken();
         resetClave = (TextView) findViewById(R.id.resetClave);
+        resetClave.setEnabled(false);
         progressDialog=new ProgressDialog(this);
         textEmail=(EditText)findViewById(R.id.editTextEmail);
         textPass=(EditText)findViewById(R.id.editTextClave);
@@ -69,32 +74,41 @@ public class MainActivity extends AppCompatActivity {
         String token = FirebaseInstanceId.getInstance().getToken();
 
         Log.d(TAG, "Token: " + token);
+        resetClave.setEnabled(false);
 
 
         botonEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, Registro.class );
-                overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                if (ConexionInternet())
+                {
+                Intent i = new Intent(MainActivity.this, Registro.class);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 startActivity(i);
+                }
             }
         });
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {
-                doLogin();
-
+                if (ConexionInternet())
+                {
+                    doLogin();
+                }
             }
         });
 
         resetClave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.sendPasswordResetEmail(textEmail.getText().toString().trim());
-                Toast.makeText(MainActivity.this,"Correo enviado\nrevisa tu correo",Toast.LENGTH_SHORT).show();
-                resetClave.setText("");
-
+                if (ConexionInternet())
+                {
+                    mAuth.sendPasswordResetEmail(textEmail.getText().toString().trim());
+                    Toast.makeText(MainActivity.this, "Correo enviado\nrevisa tu correo", Toast.LENGTH_SHORT).show();
+                    resetClave.setText("");
+                    resetClave.setEnabled(false);
+                }
             }
         });
         mAuthListener=new FirebaseAuth.AuthStateListener() {
@@ -103,9 +117,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if(firebaseAuth.getCurrentUser()!=null)
                 {
+                    System.out.println("AQUI222222222222222222222 "+firebaseAuth.getCurrentUser().getUid());
                     Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Usuario.class );
                     overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                    i.putExtra("idUsuario",firebaseAuth.getCurrentUser().getUid());
                     startActivity(i);finish();
 
                     //mAuth.signOut();
@@ -123,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.left_in,R.anim.left_out);
-        this.finish();
+        this.onDestroy();
     }
     @Override
     protected void onStart()
@@ -167,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(i);
                         } else {
                             Toast.makeText(MainActivity.this, "Logueo fallido", Toast.LENGTH_LONG).show();
+                            resetClave.setEnabled(true);
                             resetClave.setText("Recuperar contraseña aqui");
                         }
                     }
@@ -174,6 +191,28 @@ public class MainActivity extends AppCompatActivity {
             }else Toast.makeText(MainActivity.this,"Correo invalido",Toast.LENGTH_LONG).show();
         }else {Toast.makeText(MainActivity.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
         }else {Toast.makeText(MainActivity.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
+    }
+
+
+    public boolean ConexionInternet()
+    {
+        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
+        {
+            return true;
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Conexión a Internet");
+            builder.setMessage("No estás conectado a Internet");
+            builder.setPositiveButton("Aceptar",null);
+            builder.show();
+            return false;
+        }
     }
 
 }

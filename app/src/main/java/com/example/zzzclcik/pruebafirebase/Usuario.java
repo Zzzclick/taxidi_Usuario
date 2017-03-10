@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -46,6 +51,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.SQLOutput;
 import java.util.StringTokenizer;
 
 
@@ -63,6 +69,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     private static final String LOGTAG = "android-localizacion";
     AlertDialog alert = null;
     public String latAux,lonAux="0";
+    public String idUsusario;
 
     private static final int PETICION_PERMISO_LOCALIZACION = 101;
 
@@ -84,6 +91,10 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         mAuth=FirebaseAuth.getInstance();
         //imagePerfil.setImageDrawable(roundedDrawable);
 
+
+        idUsusario=getIntent().getStringExtra("idUsuario");
+
+
         apiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addConnectionCallbacks(this)
@@ -99,13 +110,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         imagePerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent();
+                if(ConexionInternet()) {
+                Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                if(intent.resolveActivity(getPackageManager())!=null)
-                {
-                    startActivityForResult(Intent.createChooser(intent,"Seleciona una foto de perfil"),CAMERA_REGUEST_CODE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(Intent.createChooser(intent, "Seleciona una foto de perfil"), CAMERA_REGUEST_CODE);
                 }
+            }
             }
         });
         btnLogOut.setOnClickListener(new View.OnClickListener() {
@@ -113,8 +125,10 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             public void onClick(View view)
             {
                 if(mAuth.getCurrentUser().getUid()!=null)
-                 {
+                 { if(ConexionInternet())
+                     {
                   mAuth.signOut(); Intent i = new Intent(Usuario.this, MainActivity.class); startActivity(i);finish();
+                     }
                  }
             }
         });
@@ -151,10 +165,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         imagenTaxi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(ConexionInternet())
+                {
                 Intent i = new Intent(Usuario.this, MapsActivity.class );
                 i.putExtra("latitud",latAux);
                 i.putExtra("Longitud",lonAux);
+                i.putExtra("idUsuario",idUsusario);
                 startActivity(i);
+                }
             }
         });
 
@@ -218,7 +236,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.left_in,R.anim.left_out);
-        this.finish(); // Sale de la aplicación
+        this.onDestroy();
     }
 
     private void AlertNoGps() {
@@ -272,29 +290,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             final StorageReference filepath=mStorage.child("photo").child(getRamdomString());
             final DatabaseReference currentUserBD=mDatabase.child(mAuth.getCurrentUser().getUid());
 
-            currentUserBD.child("latitud").setValue("");
 
-            currentUserBD.child("longitud").addChildEventListener(new ChildEventListener() {
-
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) { }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s)
-                {
-                //aqui se modifica
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) { }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) { }
-
-            });
 
 
 
@@ -310,7 +306,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful())
-                                    Toast.makeText(Usuario.this, "Foto antigua eliminada satisfactoriamente", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Usuario.this, "Foto antigua eliminada correctamente", Toast.LENGTH_SHORT).show();
                                 else
                                     Toast.makeText(Usuario.this, "Hubo un error al eliminar la foto antigua", Toast.LENGTH_SHORT).show();
                             }
@@ -393,4 +389,54 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             lblLongitud.setText("Longitud: (desconocida)");
         }
     }
+    public boolean ConexionInternet()
+    {
+        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
+                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
+        {
+            return true;
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Conexión a Internet");
+            builder.setMessage("No estás conectado a Internet");
+            builder.setPositiveButton("Aceptar",null);
+            builder.show();
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.item1:
+                Intent i = getIntent();
+                startActivity(i);
+                Toast.makeText(this,"Actualizando",Toast.LENGTH_SHORT).show();
+                finish();
+                return true;
+            case R.id.item2:
+                Intent intent = new Intent(Usuario.this, Destino.class );
+                startActivity(intent);
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }

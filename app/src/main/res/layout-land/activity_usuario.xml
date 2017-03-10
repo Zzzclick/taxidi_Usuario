@@ -9,10 +9,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.zzzclcik.pruebafirebase.Usuario">
+    tools:context="com.example.zzzclcik.pruebafirebase.Usuario"
+    android:background="@android:color/transparent">
 
     <TextView
-        android:text="TextView"
+        android:text="Nombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txtNombre"
@@ -22,14 +23,15 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textAlignment="center"
-        android:elevation="10dp" />
+        android:elevation="10dp"
+        android:textColor="#737373" />
 
     <Button
-        android:text="Cerrar sesion"
+        android:text="Cerrar sesión"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/singOut"
-        android:background="@color/colorAccent"
+        android:background="#F44336"
         android:textStyle="normal|bold"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
         android:textSize="18sp"
@@ -43,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView3"
-        android:textColor="@color/colorAccent"
+        android:textColor="#737373"
         android:textStyle="normal|bold"
         android:textSize="19sp"
         android:elevation="15dp"
@@ -57,51 +59,40 @@
         app:srcCompat="@drawable/perfil"
         android:id="@+id/imageView"
         android:elevation="10dp"
-        android:layout_below="@+id/textView3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/singOut" />
-
-    <TextView
-        android:text="Da click sobre el taxi para ver taxis cercanos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView2"
         android:layout_above="@+id/singOut"
-        android:textSize="22sp"
-        android:textStyle="normal|bold|italic"
-        android:textAlignment="center"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_toLeftOf="@+id/imageGps"
+        android:layout_toStartOf="@+id/imageGps"
+        android:layout_below="@+id/textView3" />
 
     <ImageView
-        android:layout_width="130dp"
-        android:layout_height="180dp"
+        android:layout_width="90dp"
+        android:layout_height="120dp"
         app:srcCompat="@drawable/gpstaxi"
         android:id="@+id/imageGps"
         android:elevation="10dp"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_above="@+id/textView2"
-        android:layout_alignTop="@+id/imageView"
+        android:layout_above="@+id/singOut"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="Latitud"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:id="@+id/idLatitud"
+        android:textColor="#737373"
+        android:layout_below="@+id/txtNombre"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_above="@+id/imageView"
-        android:layout_below="@+id/txtNombre" />
+        android:layout_above="@+id/imageView" />
 
     <TextView
-        android:text="TextView"
+        android:text="Longitud"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/idLongitud"
+        android:textColor="#737373"
         android:layout_toLeftOf="@+id/idLatitud"
         android:layout_toStartOf="@+id/idLatitud"
         android:layout_below="@+id/txtNombre"

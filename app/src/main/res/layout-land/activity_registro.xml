@@ -63,7 +63,7 @@
         android:id="@+id/buttonRegistrar"
         android:elevation="11dp"
         android:textStyle="normal|bold"
-        android:background="#FF4081"
+        android:background="#6AC11E"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
         android:layout_below="@+id/editTextClave"
