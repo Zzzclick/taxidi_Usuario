@@ -24,26 +24,6 @@
         android:layout_alignRight="@+id/PerfilimageView"
         android:layout_alignEnd="@+id/PerfilimageView" />
 
-    <TextView
-        android:text="No. de placas:"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/PlacastextView"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:textStyle="normal|bold"
-        android:layout_below="@+id/NombreTextView"
-        android:layout_toRightOf="@+id/NombreTextView"
-        android:layout_toEndOf="@+id/NombreTextView" />
-
-    <RatingBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/ratingBarTaxis"
-        android:layout_below="@+id/PlacastextView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
     <ImageView
         android:layout_width="match_parent"
         app:srcCompat="@drawable/perfil"
@@ -71,5 +51,57 @@
         android:layout_toEndOf="@+id/PerfilimageView"
         android:layout_marginLeft="29dp"
         android:layout_marginStart="29dp" />
+
+    <TextView
+        android:text="No. de placas:"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/PlacastextView"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="normal|bold"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/NombreTextView"
+        android:layout_toEndOf="@+id/NombreTextView" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ratingBarTaxis"
+        android:layout_above="@+id/MandarSolicitudBtn"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/PlacastextView"
+        android:layout_above="@+id/ratingBarTaxis"
+        android:layout_toRightOf="@+id/PerfilimageView"
+        android:layout_toEndOf="@+id/PerfilimageView">
+
+        <TextView
+            android:text="Las tres películas fueron escritas, producidas y dirigidas por Peter Jackson, coescritas por Fran Walsh y Philippa Boyens y distribuidas por New Line Cinema. Considerado como uno de los mayores proyectos cinematográficos nunca acometidos, con una recaudación global de más de 2900 millones USD, el proyecto completo duró ocho años, con la filmación simultánea de las tres películas y rodadas enteramente en la tierra natal de Jackson, Nueva Zelanda.
+
+A pesar de algunas variaciones, la trilogía sigue por lo general la trama principal de la novela en la que se basa. Ambientada en el ficticio mundo de la Tierra Media, sigue las aventuras del hobbit Frodo Bolsón y sus compañeros en su misión de destruir el Anillo Único y asegurar así la aniquilación del Señor Oscuro, Sauron. Sin embargo, esa comunidad se rompe y Frodo continúa su aventura junto a su fiel compañero Sam y el traicionero Gollum. Por otro lado, el mago Gandalf y Aragorn, heredero en el exilio del trono de Gondor, se unen y lideran a los pueblos libres de la Tierra Media durante varias batallas contra las fuerzas del mal.
+
+La trilogía tuvo un gran éxito de taquilla, alcanzando las tres películas los puestos 26.º, 19.º y 6.º de las más taquilleras de la historia. También fueron aclamadas por la crítica, obteniendo un total de 17 premios Óscar, así como amplias alabanzas hacia el reparto y las innovaciones en lo referente a efectos especiales digitales. Cada película de la trilogía tuvo una «edición especial extendida», publicada un año después del lanzamiento en DVD de la versión proyectada en las salas de cine.
+\nEste componente es el encargado de acceder a los content providers que se encuentran en las aplicaciones de tu dispositivo Android. Su trabajo es revisar la URI de contenido que se le brinda. Con ese dato realiza una búsqueda para llegar hasta la base de datos especiᤫcada.
+Por esa razón siempre usarás un Content Resolver para consultar, insertar, modiᤫcar y eliminar los datos de un Content Provider.\nMy Techs es una aplicación sencilla con una vista de lista que contiene los registros de cada una de las actividades asignadas a los técnicos de una empresa de telecomunicaciones.
+La idea es crear un Content Provider que envuelva la base de datos SQLite que soporta a My Techs. Todo con el ᤫn de sincronizar datos con un servidor más adelante (hipotéticamente hablando).
+Como ves, este caso aplica como fachada al Content Provider para proveer accesos por URIs, seguridad y un observador de datos para la actualización de la vista. Por lo que este componente encaja perfectamente al actuar como Modelo en un patrón MVC.
+Aunque no cubriremos las peticiones HTTP y la sincronización, este artículo cumple la misión de mostrarte como un Content Provider puede beneᤫciarnos en la carga de datos en segundo plano y la actualización de la interfaz en tiempo real.
+Para crear el Content Provider personalizado realizaremos las siguientes tareas:
+1. Crear una Api pública (clase Contract) para el consumo de datos 2. Implementar los métodos del content provider 3. Registrar el content provider en el Android Manifest
+Una vez esté lista nuestro andamiaje, veremos que propósito tiene la clase CursorLoader y cómo puede ayudarte operar datos en segundo plano.
+
+"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/comentariostextView"
+            android:textSize="18sp"
+            android:textAlignment="center" />
+    </ScrollView>
 
 </RelativeLayout>

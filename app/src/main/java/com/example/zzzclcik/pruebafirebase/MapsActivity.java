@@ -204,8 +204,10 @@ ConexionInternet();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+
+                mMap.clear();
                 Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
-                Toast.makeText(getApplicationContext(), "Empezando todos", Toast.LENGTH_SHORT).show();
+
 
                 //entris.clear();
                 idArray.clear();
@@ -215,6 +217,7 @@ ConexionInternet();
                 fotoArray.clear();
                 placasArray.clear();
                 estadosArray.clear();
+
                 while (items.hasNext())
                 {
                     DataSnapshot item=items.next();

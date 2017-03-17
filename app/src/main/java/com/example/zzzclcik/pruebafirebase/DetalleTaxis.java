@@ -8,7 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +33,7 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 public class DetalleTaxis extends AppCompatActivity {
-    private TextView Nombre2,Coordenadas2,Lat,Lon,placasText;
+    private TextView Nombre2,Coordenadas2,Lat,Lon,placasText,comentariosTxt;
     private RatingBar bar;
     private ImageView foto;
     private Button mandar;
@@ -45,6 +48,8 @@ public class DetalleTaxis extends AppCompatActivity {
     private DatabaseReference mDatabase;
     public String idUsusario,union,union2;
     public boolean auxBtn,auxEnvio=false;
+    String Rating="0#0",CometarioUlt;
+    int numComentario;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,7 @@ public class DetalleTaxis extends AppCompatActivity {
         foto=(ImageView) findViewById(R.id.PerfilimageView);
         placasText=(TextView)findViewById(R.id.PlacastextView);
         mandar=(Button)findViewById(R.id.MandarSolicitudBtn);
+        comentariosTxt=(TextView)findViewById(R.id.comentariostextView);
 
         Nombre2.setText(Nombre);
         placasText.setText("No. de placas\n"+placas);
@@ -121,7 +127,7 @@ mandar.setOnClickListener(new View.OnClickListener() {
     protected void onStart() {
         obtenerPeticiones();
         obtenerDatosUsuario();
-
+        ObtenerComentarios();
         super.onStart(); mAuth=FirebaseAuth.getInstance();
 
 
@@ -217,6 +223,9 @@ mandar.setOnClickListener(new View.OnClickListener() {
                 peticion3= dataSnapshot.child("peticion3").getValue().toString();
                 peticion4= dataSnapshot.child("peticion4").getValue().toString();
                 peticion5= dataSnapshot.child("peticion5").getValue().toString();
+                Rating= dataSnapshot.child("rating").getValue().toString();
+                System.out.println(Rating+"#############################");
+                getRating();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -227,10 +236,10 @@ mandar.setOnClickListener(new View.OnClickListener() {
     } catch (InterruptedException e) {
         e.printStackTrace();
     }*////
+
     }
     public void obtenerPeticiones2()
     {
-
         mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
 
         mDatabase.child(idTaxi).addValueEventListener(new ValueEventListener()
@@ -393,5 +402,190 @@ union=nomU+"#"+latU+"#"+lonU+"#"+idUsusario;
             builder.show();
             return false;
         }
+    }
+    public void getRating()
+    {
+        StringTokenizer token = new StringTokenizer(Rating, "#");
+        System.out.println(Rating+"$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        float rat = Float.parseFloat(token.nextToken());
+        int num = Integer.parseInt(token.nextToken());
+        float prom = rat/num;
+        bar.setRating(prom);
+        bar.setEnabled(false);
+        System.out.println("Rating actual " + prom + " #" + num);
+    }
+    public void ObtenerComentarios()
+    {
+        mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
+        mDatabase=mDatabase.child(idTaxi);
+
+        mDatabase.child("comentarios").limitToLast(10).addValueEventListener(new ValueEventListener()
+        {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                CometarioUlt= dataSnapshot.getValue().toString();
+                System.out.println("All    "+CometarioUlt);
+
+                CometarioUlt=CometarioUlt.replace("{2=Primer comentario}","");
+
+                System.out.println(CometarioUlt.length());
+                StringTokenizer token4 = new StringTokenizer(CometarioUlt, "[");
+                CometarioUlt=token4.nextToken();
+
+//CometarioUlt=CometarioUlt.substring(1,comentariosTxt.length()+1);
+                CometarioUlt=CometarioUlt.replaceAll("","");
+                CometarioUlt=CometarioUlt.replaceAll("]","");
+                CometarioUlt= CometarioUlt.replaceAll("null","");
+                CometarioUlt=CometarioUlt.replaceAll("#","\n");
+                CometarioUlt=CometarioUlt.replaceAll(",","\n\n");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!\n"+CometarioUlt+" \nAquiiiiiiiiiiiiiiiii");
+                StringTokenizer token = new StringTokenizer(CometarioUlt, ",");
+                int numTokens=token.countTokens();
+                /*
+                String comemtario1,comemtario2,comemtario3,comemtario4,comemtario5,comemtario6,comemtario7,comemtario8,comemtario9,comemtario10;
+                switch (numTokens) {
+                    case 1:
+                        comemtario1=token.nextToken();
+                        System.out.println(comemtario1);
+                          break;
+                    case 2:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2);
+                        break;
+                    case 3:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3);
+                        break;
+                    case 4:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4);
+                        break;
+                    case 5:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"  5");
+                        break;
+                    case 6:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+                        comemtario6=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
+                                +comemtario6+"  6");
+                        break;
+                    case 7:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+                        comemtario6=token.nextToken();
+                        comemtario7=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
+                                +comemtario6+"\n "+comemtario7+"  7");
+                        break;
+                    case 8:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+                        comemtario6=token.nextToken();
+                        comemtario7=token.nextToken();
+                        comemtario8=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
+                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8);
+                        break;
+                    case 9:
+                        comemtario1=token.nextToken();
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+                        comemtario6=token.nextToken();
+                        comemtario7=token.nextToken();
+                        comemtario8=token.nextToken();
+                        comemtario9=token.nextToken();
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
+                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8+"\n "+comemtario9+"\n "+"\n "
+                        );
+                        break;
+                    case 10:
+                        comemtario1=token.nextToken();
+
+
+                        comemtario2=token.nextToken();
+                        comemtario3=token.nextToken();
+                        comemtario4=token.nextToken();
+                        comemtario5=token.nextToken();
+                        comemtario6=token.nextToken();
+                        comemtario7=token.nextToken();
+                        comemtario8=token.nextToken();
+                        comemtario9=token.nextToken();
+                        comemtario10=token.nextToken();
+
+
+                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
+                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8+"\n "+comemtario9+"\n "+comemtario10+"\n "
+                        );
+                        break;
+                    default:
+
+                        break;
+
+                }*/
+
+
+
+                if(CometarioUlt!=null)
+                {
+                    final SpannableStringBuilder texto= new SpannableStringBuilder("Osiel Rios Escorcia\ntaxi muy sucio");
+                    final SpannableStringBuilder texto2= new SpannableStringBuilder("Osiel Rios Escorcia\ntaxi muy sucio");
+                    StringTokenizer token2 = new StringTokenizer(texto.toString(), "\n");//aqui hacemos el token hasta \n para extraer el nombre
+                    StringTokenizer token3 = new StringTokenizer(texto2.toString(), "\n");//aqui hacemos el token hasta \n para extraer el nombre
+                    String comentTam=token2.nextToken();//extraigo el nombre de usuario para convertirlo a String
+
+                    final StyleSpan letraEnNegrita= new StyleSpan(android.graphics.Typeface.BOLD); // Para hacer negrita
+                    texto.setSpan(letraEnNegrita, 0, comentTam.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);// Convierte los primeros caracteres en negrita pero tomando el tamaño del sTRING nombreUsuario, tu puedes decirle cuantos caracteres :)
+                    texto2.setSpan(letraEnNegrita, 0, comentTam.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);// Convierte los primeros caracteres en negrita pero tomando el tamaño del sTRING nombreUsuario, tu puedes decirle cuantos caracteres :)
+                    comentariosTxt.setText(CometarioUlt);//mandamos el texto al tEXTvIEW
+
+                }else{Toast.makeText(DetalleTaxis.this,"Verifique su conexion",Toast.LENGTH_SHORT).show();}
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+        System.out.println("Si entra}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+
     }
 }

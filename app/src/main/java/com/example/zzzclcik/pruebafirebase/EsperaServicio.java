@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.StringTokenizer;
@@ -57,8 +58,9 @@ union=getIntent().getStringExtra("union");
                 escuchador=dataSnapshot.child("estado").getValue().toString();
                 if(escuchador.equals("2"))
                 {
-                    Intent intent = new Intent(EsperaServicio.this,MapsActivityTaxi.class);
+                    Intent intent = new Intent(EsperaServicio.this,TranscursoViaje.class);
                     intent.putExtra("idTaxi",idTaxi);
+                    intent.putExtra("idUsuario",nom4);
                     //intent.putExtra("union",union2);
                     startActivity(intent);
                 }

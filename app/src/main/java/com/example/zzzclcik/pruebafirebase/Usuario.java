@@ -432,7 +432,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             case R.id.item2:
                 Intent intent = new Intent(Usuario.this, Destino.class );
                 startActivity(intent);
-
+                return true;
+            case R.id.item3:
+                Intent intent3 = new Intent(Usuario.this, CalificarTaxi.class );
+                startActivity(intent3);
+                return true;
+            case R.id.item4:
+                Intent intent4 = new Intent(Usuario.this, CalificarTaxi.class );
+                startActivity(intent4);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
