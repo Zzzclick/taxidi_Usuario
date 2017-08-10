@@ -1,7 +1,11 @@
 package com.example.zzzclcik.pruebafirebase;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +14,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,6 +26,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -34,23 +47,31 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,View.OnClickListener {
 
     private static final int LOCATION_REQUEST_CODE = 1;
     private GoogleMap mMap;
     private double value1, value2;
-    DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mensajeRef1 = ref1.child("ubicacion1");
-    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mensajeRef2 = ref2.child("ubicacion2");
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
     public String idUsusario;
+    public  boolean siEstaEnActivity;
+    public ImageView terreno,hibrido,mapa;
+    double lat1,lon1;
+    int radioBusqueda = 100;
+    View viewLayout;
+    ValueEventListener listener;
+    ValidatorUtil validatorUtil = null;
+
+    private ShowcaseView showcaseView;
+    private int contador=0;
+    private Target t1,t2,t3,t4,t5;
+
 
     ArrayList<String>idArray=new ArrayList<>();
-    ArrayList<String>latArray=new ArrayList<>();
-    ArrayList<String>lonArray=new ArrayList<>();
+    ArrayList<Double>latArray=new ArrayList<>();
+    ArrayList<Double>lonArray=new ArrayList<>();
     ArrayList<String>nameArray=new ArrayList<>();
     ArrayList<String>fotoArray=new ArrayList<>();
     ArrayList<String>placasArray=new ArrayList<>();
@@ -59,85 +80,171 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        idUsusario=getIntent().getStringExtra("idUsuario");
-        mDatabase= FirebaseDatabase.getInstance().getReference();
-
         overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
         setContentView(R.layout.activity_maps);
 
+
+        LayoutInflater layoutInflater = getLayoutInflater();
+        viewLayout = layoutInflater.inflate(R.layout.custom_toast_sininternet,(ViewGroup)findViewById(R.id.custom_layout2));
+
+        validatorUtil = new ValidatorUtil(getApplicationContext());
+        try {
+            idUsusario=getIntent().getStringExtra("idUsuario");
+            mDatabase= FirebaseDatabase.getInstance().getReference();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    terreno=(ImageView)findViewById(R.id.ImaTereno);
+    hibrido=(ImageView)findViewById(R.id.ImaHibrido);
+    mapa=(ImageView)findViewById(R.id.ImaNormal);
+
         cargarValues();
-        /* Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        */
+
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+//Obtiene valor de preferencia (la primera ocasión es por default true).
+        boolean muestra2 = getValuePreference(getApplicationContext());
+
+
+        try {
+            t1= new ViewTarget(R.id.ImaNormal, this);
+            t2= new ViewTarget(R.id.ImaHibrido, this);
+            t3= new ViewTarget(R.id.ImaTereno, this);
+            ////////////////////////////////////Inicio////////////////////////////////////////////////////////
+            showcaseView=new ShowcaseView.Builder(this)
+                    .setTarget(Target.NONE)
+                    .setOnClickListener(this)
+                    .setContentTitle("Bienvenido")
+                    .setContentText("Vamos a comenzar")
+                    .setStyle(R.style.Transparencia)
+                    .build();
+            showcaseView.setButtonText("Siguiente");
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+        }
+        //Aqui se construye el showCaseView
+        ////////////////////////////////////Fin////////////////////////////////////////////////////////////
+        ////////////////////////Inicio_______///////////////////////////////////////////
+        //aqui si no es la primera vez que se abre la activity se oculta el showCaseView
+        if(!muestra2){
+
+            saveValuePreference(getApplicationContext(), false);
+            contador=3;
+            try {
+                showcaseView.hide();
+            } catch (OutOfMemoryError e) {
+                e.printStackTrace();
+            }
+
+        }
+        /////////////////////////Fin_______/////////////////////////////////////////////
+
+
 
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    Toast.makeText(MapsActivity.this, "Ya estas logueado " + firebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
-
-                    //mAuth.signOut();
-                }
+                    if (firebaseAuth.getCurrentUser() != null) {
+                        //Toast.makeText(MapsActivity.this, "Ya estas logueado " + firebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
+                        //mAuth.signOut();
+                    }
             }
         };
-ConexionInternet();
+       mapa.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+
+                   mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                   Toast.makeText(getApplicationContext(),"Modo normal", Toast.LENGTH_SHORT).show();
+           }
+       });
+        hibrido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    Toast.makeText(getApplicationContext(),"Modo hibrido", Toast.LENGTH_SHORT).show();
+            }
+        });
+        terreno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    Toast.makeText(getApplicationContext(),"Modo terreno", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.left_in,R.anim.left_out);
+
+            try {
+                mDatabase.removeEventListener(listener);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+
+        }
+        Intent i = new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        finish();
+        startActivity(i);
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        try {
+            mDatabase.removeEventListener(listener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         latArray.clear();
         lonArray.clear();
+        siEstaEnActivity=false;
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+
+        try {
+            mDatabase.removeEventListener(listener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        siEstaEnActivity=false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        siEstaEnActivity=true;
+        registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        siEstaEnActivity=true;
     }
 
     @Override
     protected void onStart()
-    {
+    {siEstaEnActivity=true;
         super.onStart();
 
     }
 
-    protected void cargarValues() {
-/*
-
-        mensajeRef1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                value1 = dataSnapshot.getValue(double.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Error value 1", Toast.LENGTH_LONG).show();
-            }
-        });
-
-
-        mensajeRef2.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                value2 = dataSnapshot.getValue(double.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Error value 2", Toast.LENGTH_LONG).show();
-            }
-        });*/
-
+    protected void cargarValues()
+    {
         if (value1 == 0 && value2 == 0) {
             try {
                 Thread.sleep(0000);
-                Toast.makeText(getApplicationContext(), "Corriendo hilo", Toast.LENGTH_SHORT).show();
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -148,8 +255,6 @@ ConexionInternet();
         mapFragment.getMapAsync(this);
 
     }
-
-
 
     /**
      * Manipulates the map once available.
@@ -170,123 +275,112 @@ ConexionInternet();
         String latitud2 = "null1";
         String longitud2 = "null1";
 
-         latitud2 = getIntent().getStringExtra("latitud");
-        longitud2 = getIntent().getStringExtra("Longitud");
-        System.out.println("11111111"+latitud2+"222222"+longitud2);
-        if (latitud2!=null || longitud2!=null||!latitud2.equals("desconocida")||!longitud2.equals("desconocida"))
-        {
-        final double latA, lonA;
-            try
+        try {
+            latitud2 = getIntent().getStringExtra("latitud");
+            longitud2 = getIntent().getStringExtra("longitud");
+            System.out.println("11111111"+latitud2+"222222"+longitud2);
+            if (latitud2!=null || longitud2!=null||!latitud2.equals("desconocida")||!longitud2.equals("desconocida"))
             {
-                latA = Double.parseDouble(latitud2);
-                lonA = Double.parseDouble(longitud2);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
-            }catch (NumberFormatException ex)
-            {
-                Toast.makeText(getApplicationContext(), "Latitud y longitud no son números", Toast.LENGTH_SHORT).show();
-            }
-        }else{ Toast.makeText(getApplicationContext(), "No entro", Toast.LENGTH_SHORT).show(); }
-
-        // You can customize the marker image using images bundled with
-        // your app, or dynamically generated bitmaps.
-        //while (value1 == 0 && value2 == 0) {        }
-
-
-
-/*              mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                .position(new LatLng(20.1453953, -98.66203239999998)));
-                */
-        //////////////////////////////////////7
-
-        mDatabase.child("taxis").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-
-                mMap.clear();
-                Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
-
-
-                //entris.clear();
-                idArray.clear();
-                latArray.clear();
-                lonArray.clear();
-                nameArray.clear();
-                fotoArray.clear();
-                placasArray.clear();
-                estadosArray.clear();
-
-                while (items.hasNext())
+                final double latA, lonA;
+                try
                 {
-                    DataSnapshot item=items.next();
-                    String id,lat,lon,nombreIten,foto,placa,estado;
-                    id=item.child("id").getValue().toString();
-                    lat=item.child("latitud").getValue().toString();
-                    lon=item.child("longitud").getValue().toString();
-                    nombreIten=item.child("name").getValue().toString();
-                    foto=item.child("image").getValue().toString();
-                    placa=item.child("placas").getValue().toString();
-                    estado=item.child("estado").getValue().toString();
-                    idArray.add(id);
-                    latArray.add(lat);
-                    lonArray.add(lon);
-                    nameArray.add(nombreIten);
-                    fotoArray.add(foto);
-                    placasArray.add(placa);
-                    estadosArray.add(estado);
-
-                    for (int x=0;x<latArray.size();x++) {
-                        System.out.println("id" + idArray.get(x));
-                        System.out.println("Latitud:" + latArray.get(x) + " Longitud:" + lonArray.get(x));
-                        System.out.println("NOMBRE:" + nameArray.get(x));
-                        System.out.println("Imagen:" + fotoArray.get(x));
-                        System.out.println("Placas:" + placasArray.get(x));
-                        System.out.println("Estados:" + placasArray.get(x));
-                        String latAux, lonAux = "0";
-                        double aux1, aux2;
-                        String aux3, aux4, aux5, aux6;
-                        String token = FirebaseInstanceId.getInstance().getToken();
-                        if (estadosArray.get(x).equals("0"))
-                        {
-                        if (!latArray.get(x).isEmpty() || !latArray.get(x).equals("") || latArray.get(x) != null || !lonArray.get(x).isEmpty() || !lonArray.get(x).equals("") || lonArray.get(x) != null) {
-                            try {
-                                aux1 = Double.parseDouble(latArray.get(x));
-                                aux2 = Double.parseDouble(lonArray.get(x));
-                                aux3 = nameArray.get(x);
-                                aux4 = fotoArray.get(x);
-                                aux5 = placasArray.get(x);
-                                aux6 = idArray.get(x);
-                                if (aux3 != null || aux3 != null)
-                                    mMap.addMarker(new MarkerOptions()
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                                            .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                                            .title(aux3)
-                                            .snippet(aux4 + "|" + aux5 + "|" + aux6)
-                                            .position(new LatLng(aux1, aux2)));
-                            } catch (NumberFormatException ex) {
-                                Toast.makeText(getApplicationContext(), "Conversion de dobles", Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Conversion de dobles", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    }
+                    lat1 = latA = Double.parseDouble(latitud2);
+                    lon1 = lonA = Double.parseDouble(longitud2);
+                    System.out.println("Latitud Usuario: " + lat1 + " Longitud Usuario: " + lon1);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
+                }catch (NumberFormatException ex)
+                {
+                    Toast.makeText(getApplicationContext(), "Latitud y longitud no son números", Toast.LENGTH_SHORT).show();
                 }
+            }else{ /*Toast.makeText(getApplicationContext(), "No entro", Toast.LENGTH_SHORT).show();*/ }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
+        if (validatorUtil.isOnline()) {
+            try {
+                    listener = mDatabase.child("taxis").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot)
+                        {
+                            mMap.clear();
+                            Iterator<DataSnapshot>items=dataSnapshot.getChildren().iterator();
 
+                            idArray.clear();
+                            latArray.clear();
+                            lonArray.clear();
+                            nameArray.clear();
+                            fotoArray.clear();
+                            placasArray.clear();
+                            estadosArray.clear();
+
+                            while (items.hasNext())
+                            {
+                                try {
+                                    DataSnapshot item=items.next();
+                                    String id,nombreIten,foto,placa,estado;
+                                    double lat,lon;
+                                    try
+                                    {
+                                        id=item.child("id").getValue().toString();
+                                        nombreIten=item.child("name").getValue().toString();
+                                        foto=item.child("image").getValue().toString();
+                                        placa=item.child("placas").getValue().toString();
+                                        estado=item.child("estado").getValue().toString();
+                                        lat = Double.parseDouble(item.child("latitud").getValue().toString());
+                                        lon = Double.parseDouble(item.child("longitud").getValue().toString());
+                                        if ((latArray.size() <= 6) || (lonArray.size() <= 6) || (idArray.size() <= 6) || (nameArray.size() <= 6) ||
+                                                (fotoArray.size() <= 6) || (placasArray.size() <= 6) || (estadosArray.size() <= 6)) {
+                                            latArray.add(lat);
+                                            lonArray.add(lon);
+                                            idArray.add(id);
+                                            nameArray.add(nombreIten);
+                                            fotoArray.add(foto);
+                                            placasArray.add(placa);
+                                            estadosArray.add(estado);
+                                        }
+                                    }catch (NumberFormatException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    if(!latArray.isEmpty()) {
+                                        for (int x = 0; x < latArray.size(); x++) {
+                                            if (estadosArray.get(x).equals("0")) {
+                                                mMap.addMarker(new MarkerOptions()
+                                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                                                        .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                                                        .title(nameArray.get(x))
+                                                        .snippet(fotoArray.get(x) + "|" + placasArray.get(x) + "|" + idArray.get(x))
+                                                        .position(new LatLng(latArray.get(x), lonArray.get(x))));
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        radioBusqueda = radioBusqueda + 50;
+                                    }
+                                } catch (NullPointerException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(getApplicationContext(),"Error en la base de datos " + databaseError.toString(),Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+        }
+        else
+            {
+                Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_LONG);
+                customToast.setGravity(Gravity.BOTTOM,0,0);
+                customToast.setView(viewLayout);
+                customToast.show();
             }
-        });//
-
-
-        ///////////////////////////////////////7
-
 
 
         System.out.println(latArray.size()+"     Tamaño del arreglo de latitud");
@@ -295,31 +389,29 @@ ConexionInternet();
             System.out.println("Si esta imprimiendo Latitud:"+latArray.get(x)+" Longuitud:"+lonArray.get(x));
         }
 
-        //////Para crear marcador con un click largo
-        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                        .anchor(0.0f, 0.1f)
-                        .position(latLng));
-
-            }
-        });*/
-
-
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(), "Has pulsado una marca", Toast.LENGTH_SHORT).show();
 
-                Intent i = new Intent(MapsActivity.this, DetalleTaxis.class );
-                i.putExtra("nombre",marker.getTitle());
-                i.putExtra("posicion",marker.getPosition());
-                i.putExtra("foto",marker.getSnippet());
-                i.putExtra("idUsuario",idUsusario);
+                if (validatorUtil.isOnline()) {
+                    Intent i = new Intent(MapsActivity.this, DetalleTaxis.class );
+                    i.putExtra("nombre",marker.getTitle());
+                    i.putExtra("foto",marker.getSnippet());
+                    i.putExtra("latitud",Double.toString(lat1));
+                    i.putExtra("longitud",Double.toString(lon1));
+                    i.putExtra("idUsuario",idUsusario);
+                    finish();
+                    startActivity(i);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                }
+                else
+                    {
+                        Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_LONG);
+                        customToast.setGravity(Gravity.BOTTOM,0,0);
+                        customToast.setView(viewLayout);
+                        customToast.show();
+                    }
 
-                startActivity(i);
                 return false;
             }
         });
@@ -339,24 +431,133 @@ ConexionInternet();
         mMap.setMyLocationEnabled(true);
         System.out.println("!!!!!!!!!!prueba "+mMap.isMyLocationEnabled());
     }
-    public boolean ConexionInternet()
-    {
-        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
-        {
-            return true;
-        }
-        else
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Conexión a Internet");
-            builder.setMessage("No estás conectado a Internet");
-            builder.setPositiveButton("Aceptar",null);
-            builder.show();
-            return false;
-        }
+
+    public double distanciaCoordenadas(double lat1, double lng1, double lat2, double lng2) {
+        double radioTierra = 6371;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double sindLat = Math.sin(dLat / 2);
+        double sindLng = Math.sin(dLng / 2);
+        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
+        double distanciaKM = radioTierra * va2;
+
+        double distanciaM = distanciaKM * 1000;
+
+        return distanciaM;
     }
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ValidatorUtil validatorUtil = new ValidatorUtil(context);
+            if (!validatorUtil.isOnline())
+            {
+                Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_LONG);
+                customToast.setGravity(Gravity.BOTTOM,0,0);
+                customToast.setView(viewLayout);
+                customToast.show();
+            }
+        }
+    };
+
+    @Override
+    public void onPause() {
+        unregisterReceiver(networkStateReceiver);
+        super.onPause();
+        try {
+            mDatabase.removeEventListener(listener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    ///////////////////////////////////////Para el showCaseView por primera vez__Inicio///////////////////////////////////////////
+    private String PREFS_KEY = "mispreferencias";
+
+    public void saveValuePreference(Context context, Boolean mostrar) {
+        SharedPreferences settings = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        editor.putBoolean("MapsActivity", mostrar);
+        editor.commit();
+    }
+
+
+
+    public boolean getValuePreference(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getBoolean("MapsActivity", true);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (contador) {
+            case 0:
+                try {
+                    showcaseView.setShowcase(t1, true);
+                    showcaseView.setContentTitle("Modo normal");
+                    showcaseView.setContentText("Aquí podrás cambiar a modo normal el mapa ");
+                    break;
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                }
+            case 1:
+
+                try {
+                    showcaseView.setShowcase(t2, true);
+                    showcaseView.setContentTitle("Modo híbrido");
+                    showcaseView.setContentText("Aquí podrás cambiar a modo híbrido el mapa para ver el mapa satelital ");
+                    break;
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                }
+            case 2:
+                try {
+                    showcaseView.setShowcase(t3, true);
+                    showcaseView.setContentTitle("Modo terreno");
+                    showcaseView.setContentText("Aquí podrás cambiar a modo terreno el mapa viendo la elevación del terreno ");
+                    showcaseView.setButtonText("Finalizar");
+                    break;
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                }
+
+            case 3:
+                try {
+                    showcaseView.hide();
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                }
+                boolean muestra2 = getValuePreference(getApplicationContext());
+                if(muestra2)
+                {
+                    saveValuePreference(getApplicationContext(), false);
+                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+
+                break;
+        }
+
+        contador++;
+    }
+
+    /////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
+    public  void Ayuda()
+    {
+        contador=0;
+        showcaseView.show();
+        showcaseView.setTarget(Target.NONE);
+        showcaseView.setContentTitle("Bienvenido");
+        showcaseView  .setContentText("Vamos a comenzar");
+        showcaseView.setButtonText("Siguiente");
+    }
+    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
+
+    ///////////////////////////////////////Para el showCaseView por primera vez___Fin///////////////////////////////////////////
+
 }

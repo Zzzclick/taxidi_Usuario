@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">PruebaFirebase</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_maps_taxi">Map</string>
+    <string name="app_name">Usuario</string>
+    <string name="title_activity_maps">GPS</string>
+    <string name="title_activity_maps_taxi">GPS Taxi</string>
+    <string name="facebook_app_id">237776893361225</string>
 
 </resources>

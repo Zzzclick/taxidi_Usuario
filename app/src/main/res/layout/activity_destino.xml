@@ -8,113 +8,122 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.zzzclcik.pruebafirebase.Destino">
+    tools:context="com.example.zzzclcik.pruebafirebase.Destino"
+    android:background="@drawable/logo">
 
     <TextView
         android:id="@+id/tvPlaceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/btGetPlace"
+        android:layout_marginTop="50dp"
         android:text="Place Name"
+        android:textColor="@color/cast_expanded_controller_background_color"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginTop="50dp"
-        android:layout_below="@+id/btGetPlace"
-         />
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/tvPlaceAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Place Address"
-        android:textSize="16sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/btGetPlace"
-        />
+        android:text="Dirección"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="16sp" />
 
     <TextView
-        android:text=""
+        android:id="@+id/TiempoTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true"
-        android:id="@+id/TiempoTextView"
-        android:textAlignment="center" />
+        android:text="n/a"
+        android:textAlignment="center"
+        android:textColor="@color/cast_expanded_controller_background_color" />
 
     <TextView
-        android:text="Tiempo aproximado"
+        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
-        android:id="@+id/textView2"
-        android:textStyle="normal|bold"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:layout_below="@+id/tvPlaceName"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvPlaceName"
+        android:layout_marginTop="21dp"
+        android:text="Tiempo aproximado"
+        android:textAlignment="center"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="20sp" />
 
     <WebView
         android:id="@+id/wvAttribution"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Attribution"
-        android:textSize="16sp"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:background="@color/cardview_light_background"
+        android:text="Attribution"
+        android:textSize="1sp"
+        android:visibility="invisible" />
 
     <TextView
+        android:id="@+id/resultado"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/resultado"
-        android:layout_below="@+id/CostoTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="47dp" />
-
-    <TextView
-        android:text="Costo  aproximado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView5"
-        android:textStyle="normal|bold"
-        android:textSize="20sp"
-        android:textAlignment="center"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
+        android:layout_below="@+id/CostoTextView"
+        android:layout_marginTop="47dp"
         android:text=""
+        android:textColor="@color/cast_expanded_controller_background_color" />
+
+    <TextView
+        android:id="@+id/textView5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/CostoTextView"
-        android:textAlignment="center"
-        android:layout_below="@+id/textView5"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:text="Costo  aproximado"
+        android:textAlignment="center"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/CostoTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView5"
+        android:text="n/a"
+        android:textAlignment="center"
+        android:textColor="@color/cast_expanded_controller_background_color" />
 
     <Button
         android:id="@+id/btGetPlace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/boton_redondo1"
         android:text="Selecionar destino"
-        android:background="@color/colorAccent1"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textStyle="normal|bold"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:drawableLeft="@drawable/destino_dos"/>
 
     <Button
-        android:text="Aceptar"
+        android:id="@+id/btnAceptar"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:id="@+id/button2"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:background="@color/colorAccent2"
-        android:textStyle="normal|bold"
-        android:textSize="20sp"
         android:layout_above="@+id/wvAttribution"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/boton_redondo2"
+        android:text="Aceptar"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textSize="20sp"
+        android:drawableLeft="@drawable/listo"/>
 
 </RelativeLayout>

@@ -9,4 +9,23 @@
 
     </style>
 
+    <style name="Titulo" parent="TextAppearance.ShowcaseView.Title.Light">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textSize">55dp</item>
+    </style>
+    <style name="Descripcion" parent="TextAppearance.ShowcaseView.Title.Light">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="Boton" parent="TextAppearance.ShowcaseView.Title.Light">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="Transparencia" parent="ShowcaseView.Light">
+        <item name="sv_backgroundColor">#7c000000</item>
+        <item name="sv_showcaseColor">#32B6E3</item>
+        <item name="sv_titleTextAppearance">@style/Titulo</item>
+        <item name="sv_detailTextAppearance">@style/Descripcion</item>
+    </style>
+
 </resources>

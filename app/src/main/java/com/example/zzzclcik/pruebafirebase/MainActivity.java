@@ -1,6 +1,13 @@
 package com.example.zzzclcik.pruebafirebase;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -9,12 +16,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -25,122 +53,284 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-    private TextView mensajeTextView;
-    private EditText mensajeEditText;
-    private EditText textEmail;
-    private EditText textPass;
+import java.util.StringTokenizer;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView infoTextView,resetClave;
-    private Button btnRegister;
     private Boolean aux=false;
     public String idUsuario;
-
+    boolean SiEstaEnViaje=false;
     private ProgressDialog progressDialog;
-
-    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mensajeRef = ref.child("mensaje");
-
-    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mensajeRef2 = ref2.child("ubicacion");
+    private DatabaseReference mDatabase;
+    ValueEventListener listener;
+    DatabaseReference ref;
+    DatabaseReference mensajeRef;
+    View viewLayout,viewLayout2;
+    DatabaseReference ref2;
+    DatabaseReference mensajeRef2;
+    private ShowcaseView showcaseView;
+    private int contador=0;
+    private Target t5;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     public static final String TAG = "NOTICIAS";
 
+    private CallbackManager mCallbackManager;
 
+    String id,emailF,nameF;
+
+    ValidatorUtil validarConexion = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.right_in,R.anim.right_out);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("Iniciar Sesión");
+        validarConexion = new ValidatorUtil(getApplicationContext());
 
-        FirebaseInstanceId.getInstance().getToken();
-        resetClave = (TextView) findViewById(R.id.resetClave);
-        resetClave.setEnabled(false);
+        LayoutInflater layoutInflater = getLayoutInflater();
+        viewLayout = layoutInflater.inflate(R.layout.custom_toast_sininternet,(ViewGroup)findViewById(R.id.custom_layout2));
+
+        String carpetaFuente = "fonts/Graphik-Bold.otf";
+        Typeface fuente = Typeface.createFromAsset(getAssets(), carpetaFuente);
+
+
+
+        try {
+                ref = FirebaseDatabase.getInstance().getReference();
+                mensajeRef = ref.child("mensaje");
+
+                ref2 = FirebaseDatabase.getInstance().getReference();
+                mensajeRef2 = ref2.child("ubicacion");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+                FirebaseInstanceId.getInstance().getToken();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         progressDialog=new ProgressDialog(this);
-        textEmail=(EditText)findViewById(R.id.editTextEmail);
-        textPass=(EditText)findViewById(R.id.editTextClave);
-        btnRegister=(Button)findViewById(R.id.buttonEntrar);
+
         mAuth=FirebaseAuth.getInstance();
 
 
-        Button botonEnviar=(Button)findViewById(R.id.buttonRegistro);
-
-
-
-
-        String token = FirebaseInstanceId.getInstance().getToken();
-
-        Log.d(TAG, "Token: " + token);
-        resetClave.setEnabled(false);
-
-
-        botonEnviar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ConexionInternet())
-                {
-                Intent i = new Intent(MainActivity.this, Registro.class);
-                overridePendingTransition(R.anim.left_in, R.anim.left_out);
-                startActivity(i);
-                }
-            }
-        });
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                if (ConexionInternet())
-                {
-                    doLogin();
-                }
-            }
-        });
-
-        resetClave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ConexionInternet())
-                {
-                    mAuth.sendPasswordResetEmail(textEmail.getText().toString().trim());
-                    Toast.makeText(MainActivity.this, "Correo enviado\nrevisa tu correo", Toast.LENGTH_SHORT).show();
-                    resetClave.setText("");
-                    resetClave.setEnabled(false);
-                }
-            }
-        });
-        mAuthListener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                if(firebaseAuth.getCurrentUser()!=null)
-                {
-                    System.out.println("AQUI222222222222222222222 "+firebaseAuth.getCurrentUser().getUid());
-                    Toast.makeText(MainActivity.this,"Ya estas logueado "+firebaseAuth.getCurrentUser().getUid(),Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(MainActivity.this, Usuario.class );
-                    overridePendingTransition(R.anim.left_in,R.anim.left_out);
-                    i.putExtra("idUsuario",firebaseAuth.getCurrentUser().getUid());
-                    startActivity(i);finish();
-
-                    //mAuth.signOut();
-                }
-
-            }
-        };
         try {
-            Thread.sleep(1500);
-            Toast.makeText(getApplicationContext(),"Corriendo hilo", Toast.LENGTH_SHORT).show();
-        } catch (InterruptedException e) {e.printStackTrace();}
+            t5= new ViewTarget(R.id.login_button, this);
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////
+//Obtiene valor de preferencia (la primera ocasión es por default true).
+        boolean muestra = getValuePreference(getApplicationContext());
+
+
+
+
+        ////////////////////////////////////Inicio////////////////////////////////////////////////////////
+        try {
+            showcaseView=new ShowcaseView.Builder(this)
+                    .setTarget(Target.NONE)
+                    .setOnClickListener(this)
+                    .setContentTitle("Bienvenido")
+                    .setContentText("Vamos a comenzar")
+                    .setStyle(R.style.Transparencia)
+                    .build();
+            showcaseView.setButtonText("Siguiente");
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+        }
+        //Aqui se construye el showCaseView
+       ////////////////////////////////////Fin////////////////////////////////////////////////////////////
+        ////////////////////////Inicio_______///////////////////////////////////////////
+        //aqui si no es la primera vez que se abre la activity se oculta el showCaseView
+        if(!muestra){
+
+            saveValuePreference(getApplicationContext(), false);
+            contador=5;
+            showcaseView.hide();
+
+        }
+        /////////////////////////Fin_______/////////////////////////////////////////////
+       
+
+
+
+
+        String token = null;
+        try {
+            token = FirebaseInstanceId.getInstance().getToken();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        if (getIntent().hasExtra("logout")) {
+            LoginManager.getInstance().logOut();
+        }
+        mAuth = FirebaseAuth.getInstance();
+        mCallbackManager = CallbackManager.Factory.create();
+        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        loginButton.setTypeface(fuente);
+        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handleFacebookAccessToken(loginResult.getAccessToken());
+                Log.d("", "facebook:onSuccess:" + loginResult);
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("TAG", "facebook:onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d("TAG", "facebook:onError", error);
+            }
+        });
+
+        try {
+            mAuthListener = new FirebaseAuth.AuthStateListener() {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null) {
+
+                        Log.d("", "onAuthStateChanged:signed_in:" + user.getUid());
+
+                        Intent intent = new Intent(MainActivity.this, Usuario.class);
+                        String email = user.getEmail();
+                        String name = user.getDisplayName();
+
+                        System.out.println("55555555\n"+email+"\n"+name+"\n"+firebaseAuth.getCurrentUser().getUid());
+                        System.out.println("888"+user.getProviderId());
+                        intent.putExtra("idUsuario",user.getUid());
+
+                    } else {
+                        Log.d("TG", "SIGNED OUT");
+                    }
+                }
+            };
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+/////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+        try {
+                mAuthListener=new FirebaseAuth.AuthStateListener() {
+                    @Override
+                    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                        if(firebaseAuth.getCurrentUser()!=null)
+                        { String email = firebaseAuth.getCurrentUser().getEmail();
+                            String name = firebaseAuth.getCurrentUser().getDisplayName();
+                            id=firebaseAuth.getCurrentUser().getUid();
+                            emailF=firebaseAuth.getCurrentUser().getEmail();
+                            nameF=firebaseAuth.getCurrentUser().getDisplayName();
+                            System.out.println("AQUI222222222222222222222   "+id);
+
+                            Intent i = new Intent(getApplicationContext(),Usuario.class);
+                            overridePendingTransition(R.anim.left_in,R.anim.left_out);
+                            i.putExtra("idUsuario",id);
+                            startActivity(i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));finish();
+
+                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                            mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
+                            idUsuario=firebaseAuth.getCurrentUser().getUid();
+                            System.out.println("Paso   QQQQQ");
+                            mDatabase.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    String ValorViaje="";
+                                    try {
+                                        ValorViaje = (dataSnapshot.child("ViajeA").getValue().toString());
+
+                                        if(ValorViaje!=null||!ValorViaje.equals(""))
+                                        {
+                                            StringTokenizer token = new StringTokenizer(ValorViaje, "#");
+                                            String idTaxi="nada",estado;
+                                            estado=token.nextToken();
+                                            idTaxi=token.nextToken();
+
+
+
+                                            if(estado.equals("1")){
+                                                ////
+                                                SiEstaEnViaje=true;
+                                            }
+                                            if(SiEstaEnViaje)
+                                            {
+                                                Intent intent = new Intent(getApplicationContext(),MapsActivityTaxi.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                                intent.putExtra("idTaxi",idTaxi);
+                                                intent.putExtra("idUsuario",idUsuario);
+                                                System.out.println("Cargando datos de viaje\n"+idTaxi+" \n"+idUsuario);
+                                                startActivity(intent);
+                                                Toast.makeText(getApplicationContext(),"Cargando datos de viaje", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        }
+                                        //(5
+                                    } catch (NullPointerException e) { e.printStackTrace();
+                                        System.out.println("|||||||||||||||||||||TRono aqui "); }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            //mAuth.signOut();
+                        }
+                    }
+                };
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.left_in,R.anim.left_out);
-        this.onDestroy();
+        if(listener != null)
+        {
+            mDatabase.removeEventListener(listener);
+        }
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        finish();
+        startActivity(intent);
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
     }
+
     @Override
     protected void onStart()
     {
@@ -148,71 +338,189 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    public void modificar() {
-        String mensaje = mensajeEditText.getText().toString();
-        mensajeRef.setValue(mensaje);
 
-        mensajeEditText.setText("");
-    }
-    public void doLogin()
-    {
-        String email=textEmail.getText().toString().trim();
-        String password=textPass.getText().toString().trim();
-        if(!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)) {
 
-            char[] arrayChar1 = email.toCharArray();
-            char[] arrayChar2 = password.toCharArray();
-            if (arrayChar2.length > 5) {
-                for (int i = 0; i < arrayChar1.length; i++) {
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d("", "handleFacebookAccessToken:" + token);
 
-                    if (arrayChar1[i] == '@'){
-                        Toast.makeText(MainActivity.this, "Correo valido", Toast.LENGTH_LONG).show();aux = true;}
-                }
-                if (aux==true) {
-
-                progressDialog.setMessage("Entrando,espere por favor");
-                progressDialog.show();
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Logueo correcto", Toast.LENGTH_SHORT).show();
-                            overridePendingTransition(R.anim.left_in,R.anim.left_out);
-                            Intent i = new Intent(MainActivity.this, Usuario.class);
-                            startActivity(i);
-                        } else {
-                            Toast.makeText(MainActivity.this, "Logueo fallido", Toast.LENGTH_LONG).show();
-                            resetClave.setEnabled(true);
-                            resetClave.setText("Recuperar contraseña aqui");
+                        Log.d("", "signInWithCredential:onComplete:" + task.isSuccessful());
+                        if (!task.isSuccessful()) {
+                            Log.w("", "signInWithCredential", task.getException());
+                            Toast.makeText(MainActivity.this, "Autenticación fallida.",
+                                    Toast.LENGTH_SHORT).show();
                         }
+                        if(task.isSuccessful())
+                        {
+                            if(id!=null)
+                            {obtenerDatosUsuario();
+                                Toast.makeText(MainActivity.this, "Autenticación exitosa",Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+
                     }
                 });
-            }else Toast.makeText(MainActivity.this,"Correo invalido",Toast.LENGTH_LONG).show();
-        }else {Toast.makeText(MainActivity.this,"La contraseña debe tener minimo 6 digitos",Toast.LENGTH_LONG).show();}
-        }else {Toast.makeText(MainActivity.this,"Por favor introduce datos",Toast.LENGTH_SHORT).show();}
     }
-
-
-    public boolean ConexionInternet()
+    public void obtenerDatosUsuario()
     {
-        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
+
+        mDatabase= FirebaseDatabase.getInstance().getReference().child("users").child(id);
+
+        listener = mDatabase.addValueEventListener(new ValueEventListener()
         {
-            return true;
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {String Nombre="";
+                try {
+                    Nombre= dataSnapshot.child("name").getValue().toString();
+                    System.out.println("12134543211123435 "+Nombre);
+                } catch (NullPointerException e) {e.printStackTrace();}
+
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+        System.out.println(id);
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
+            DatabaseReference currentUserBD = mDatabase.child(id);
+        System.out.println("id "+id+" QQQ "+currentUserBD);
+            currentUserBD.child("name").setValue(nameF);
+            currentUserBD.child("email").setValue(emailF);
+            currentUserBD.child("estado").setValue("0");
+            currentUserBD.child("image").setValue("default");
+            currentUserBD.child("ViajeA").setValue("0#vacio");
+            currentUserBD.child("sesion").setValue("Facebook");
+            currentUserBD.child("telefono").setValue("no");
+
+            DatabaseReference currentUserBD2 = FirebaseDatabase.getInstance().getReference().child("tipo");
+            currentUserBD2.child(id).setValue("usuario");
+
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode,
+                resultCode, data);
+    }
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ValidatorUtil validatorUtil = new ValidatorUtil(context);
+            if (!validatorUtil.isOnline())
+            {
+                Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_LONG);
+                customToast.setGravity(Gravity.CENTER,0,0);
+                customToast.setView(viewLayout);
+                customToast.show();
+            }
         }
-        else
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    public void onPause() {
+        unregisterReceiver(networkStateReceiver);
+        super.onPause();
+        if(listener != null)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Conexión a Internet");
-            builder.setMessage("No estás conectado a Internet");
-            builder.setPositiveButton("Aceptar",null);
-            builder.show();
-            return false;
+            mDatabase.removeEventListener(listener);
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(listener != null)
+        {
+            mDatabase.removeEventListener(listener);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(listener != null)
+        {
+            mDatabase.removeEventListener(listener);
+        }
+    }
+    ///////////////////////////////////////////////OnClickEscuchador/////////////////////////////////////////////////////////////////
+    @Override
+    public void onClick(View v) {
+        switch (contador) {
+
+            case 0:
+                showcaseView.setShowcase(t5, true);
+                showcaseView.setContentTitle("Entrar con facebook");
+                showcaseView.setContentText("presiona el botón para registrarse o ingresar con tu perfil de facebook");
+                showcaseView.setButtonText("Finalizar");
+                break;
+
+            case 1:
+                showcaseView.hide();
+                boolean muestra = getValuePreference(getApplicationContext());
+                if(muestra)
+                {
+                    saveValuePreference(getApplicationContext(), false);
+                  //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+
+                break;
+        }
+
+        contador++;
+
+    }
+///////////////////////////////////////////////OnClickEscuchador/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private String PREFS_KEY = "mispreferencias";
+
+    public void saveValuePreference(Context context, Boolean mostrar) {
+        SharedPreferences settings = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        editor.putBoolean("MainActivity", mostrar);
+        editor.commit();
+    }
+
+
+
+    public boolean getValuePreference(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getBoolean("MainActivity", true);
+    }
+    public boolean getValuePreference2(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getBoolean("SiCalifico",false);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
+    public  void Ayuda()
+    {
+        contador=0;
+        showcaseView.show();
+        showcaseView.setTarget(Target.NONE);
+        showcaseView.setContentTitle("Bienvenido");
+        showcaseView.setContentText("Vamos a comenzar");
+        showcaseView.setButtonText("Siguiente");
+    }
+    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
+
 
 }

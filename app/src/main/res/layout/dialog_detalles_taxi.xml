@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+
+    <TextView
+        android:id="@+id/nombreDet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nombre"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/fotoDet"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:textAlignment="center"
+        app:srcCompat="@drawable/perfil"
+        android:layout_below="@+id/nombreDet"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/enviarDet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/boton_redondo1"
+        android:drawableLeft="@drawable/enviar_dos"
+        android:text=" Enviar petición "
+        android:textColor="@color/cardview_light_background"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_below="@+id/ratingDet"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp" />
+    <TextView
+        android:id="@+id/placasDet"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="No. de placas:"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:layout_below="@+id/fotoDet"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <RatingBar
+        android:id="@+id/ratingDet2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:numStars="5"
+        android:rating="5.0"
+        android:stepSize="1"
+        android:layout_above="@+id/EnviarDet"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/scrollView2" />
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/placasDet">
+
+        <TextView
+            android:id="@+id/comentariosDet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/scrollView2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/PlacastextView"
+            android:text="Comentarios"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/ratingDet"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/scrollView2"
+        android:background="@drawable/boton_redondo3"
+        android:text="Aún\nno tiene\ncalificación"
+        android:textAlignment="center"
+        android:textColor="#EAECEC"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

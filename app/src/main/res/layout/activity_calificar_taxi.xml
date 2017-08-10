@@ -8,64 +8,187 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.zzzclcik.pruebafirebase.CalificarTaxi">
+    tools:context="com.example.zzzclcik.pruebafirebase.CalificarTaxi"
+    android:background="@drawable/logo">
 
     <RatingBar
+        android:id="@+id/ratingBarTaxis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:id="@+id/ratingBarTaxis"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textViewTitulo"
+        android:layout_marginEnd="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginTop="16dp"
         android:numStars="5"
-        android:stepSize="0.5"
-        android:layout_below="@+id/textView6"
-        android:layout_centerHorizontal="true" />
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:stepSize="1" />
 
     <Button
-        android:text=" Enviar "
-        android:layout_width="120dp"
+        android:id="@+id/Enviarbutton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/Enviarbutton"
+        android:background="@drawable/boton_redondo1"
+        android:drawableLeft="@drawable/calificar"
+        android:text="Calificar "
         android:textAlignment="center"
-        android:textStyle="normal|bold"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="18sp"
-        android:background="@color/colorAccent1" />
+        android:textSize="18sp" />
 
     <TextView
-        android:text="Califica el taxi"
+        android:id="@+id/textViewTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView6"
-        android:textAlignment="center"
-        android:textStyle="normal|bold"
-        android:textSize="25sp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="Califica el taxi"
+        android:textAlignment="center"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="25sp" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
+        android:hint="Escribe un comentario"
         android:ems="10"
-        android:layout_below="@+id/ratingBarTaxis"
+        android:maxLength="45"
+        android:id="@+id/comentarioEditText"
+        android:layout_below="@+id/ratingBarTaxis4"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="100dp"
-        android:maxLength="45"
-        android:id="@+id/comentarioEditText" />
+        android:layout_marginTop="21dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
-    <TextView
-        android:text="TextView"
+    <RatingBar
+        android:id="@+id/ratingBarTaxis1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/Enviarbutton"
-        android:layout_alignLeft="@+id/Enviarbutton"
-        android:layout_alignStart="@+id/Enviarbutton"
-        android:layout_marginLeft="19dp"
-        android:layout_marginStart="19dp"
-        android:layout_marginBottom="46dp"
-        android:id="@+id/PruebaTextView7" />
+        android:layout_alignLeft="@+id/ratingBarTaxis"
+        android:layout_alignStart="@+id/ratingBarTaxis"
+        android:layout_below="@+id/ratingBarTaxis"
+        android:numStars="5"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:stepSize="1" />
+
+    <RatingBar
+        android:id="@+id/ratingBarTaxis3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ratingBarTaxis2"
+        android:layout_alignStart="@+id/ratingBarTaxis2"
+        android:layout_below="@+id/ratingBarTaxis2"
+        android:numStars="5"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:stepSize="1" />
+
+    <RatingBar
+        android:id="@+id/ratingBarTaxis2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ratingBarTaxis1"
+        android:layout_alignStart="@+id/ratingBarTaxis1"
+        android:layout_below="@+id/ratingBarTaxis1"
+        android:numStars="5"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:stepSize="1" />
+
+    <RatingBar
+        android:id="@+id/ratingBarTaxis4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ratingBarTaxis3"
+        android:layout_alignStart="@+id/ratingBarTaxis3"
+        android:layout_below="@+id/ratingBarTaxis3"
+        android:numStars="5"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:stepSize="1" />
+
+    <TextView
+        android:id="@+id/textViewManejo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ratingBarTaxis2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="19dp"
+        android:layout_toLeftOf="@+id/ratingBarTaxis1"
+        android:layout_toStartOf="@+id/ratingBarTaxis1"
+        android:text="Manejo"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/textViewUnidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unidad"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="14sp"
+        android:layout_below="@+id/ratingBarTaxis1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="19dp"
+        android:layout_toLeftOf="@+id/ratingBarTaxis2"
+        android:layout_toStartOf="@+id/ratingBarTaxis2" />
+
+    <TextView
+        android:id="@+id/textViewServicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Servicio"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="14sp"
+        android:layout_below="@+id/ratingBarTaxis2"
+        android:layout_marginTop="19dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/ratingBarTaxis3"
+        android:layout_toStartOf="@+id/ratingBarTaxis3" />
+
+    <TextView
+        android:id="@+id/textViewAtencion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Atención"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="14sp"
+        android:layout_below="@+id/ratingBarTaxis3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/ratingBarTaxis4"
+        android:layout_toStartOf="@+id/ratingBarTaxis4" />
+
+    <TextView
+        android:id="@+id/textViewAmabilidad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/ratingBarTaxis"
+        android:layout_marginTop="20dp"
+        android:layout_toLeftOf="@+id/ratingBarTaxis"
+        android:layout_toStartOf="@+id/ratingBarTaxis"
+        android:text="Amabilidad"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/cast_expanded_controller_background_color"
+        android:textSize="14sp" />
+
 </RelativeLayout>

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.zzzclcik.pruebafirebase.EsperaTaxis">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+
+
+        <Button
+            android:id="@+id/buttonUnoRechazar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+
+            android:layout_marginStart="8dp"
+            android:background="@drawable/boton_redondo2"
+            android:drawableLeft="@drawable/botoncancel"
+            android:text="Rechazar "
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:textSize="12sp"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textViewDos"
+            app:layout_constraintRight_toLeftOf="@+id/buttonUnoAceptar"
+            android:layout_marginRight="8dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUno" />
+
+        <Button
+            android:id="@+id/buttonUnoAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_above="@+id/scrollView2"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toEndOf="@+id/SinPeticiones_textView"
+            android:layout_toRightOf="@+id/SinPeticiones_textView"
+            android:background="@drawable/boton_redondo1"
+            android:drawableLeft="@drawable/listo"
+            android:text="Aceptar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUno" />
+
+        <Button
+            android:id="@+id/buttonDosAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+
+            android:layout_alignLeft="@+id/buttonUnoAceptar"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignStart="@+id/buttonUnoAceptar"
+            android:layout_below="@+id/scrollView2"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/boton_redondo1"
+            android:drawableLeft="@drawable/listo"
+            android:text="Aceptar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewDos" />
+
+        <Button
+            android:id="@+id/buttonDosRechazar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignEnd="@+id/buttonUnoRechazar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/buttonUnoRechazar"
+            android:layout_below="@+id/scrollView2"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/boton_redondo2"
+            android:drawableLeft="@drawable/botoncancel"
+            android:text="Rechazar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="6dp"
+            app:layout_constraintTop_toBottomOf="@+id/textViewDos"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewTres"
+            app:layout_constraintRight_toLeftOf="@+id/buttonDosAceptar"
+            android:layout_marginRight="8dp"
+            app:layout_constraintHorizontal_bias="0.0" />
+
+        <Button
+            android:id="@+id/buttonTresAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+
+            android:layout_alignLeft="@+id/buttonDosAceptar"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignStart="@+id/buttonDosAceptar"
+            android:layout_below="@+id/scrollView3"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/boton_redondo1"
+            android:drawableLeft="@drawable/listo"
+            android:text="Aceptar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTres" />
+
+        <Button
+            android:id="@+id/buttonTresRechazar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignEnd="@+id/buttonDosRechazar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/buttonDosRechazar"
+            android:layout_below="@+id/scrollView3"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/boton_redondo2"
+            android:drawableLeft="@drawable/botoncancel"
+            android:text="Rechazar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTres"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewCuatro"
+            app:layout_constraintRight_toLeftOf="@+id/buttonTresAceptar"
+            android:layout_marginRight="8dp"
+            app:layout_constraintHorizontal_bias="0.0" />
+
+        <Button
+            android:id="@+id/buttonCuatroRechazar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_toLeftOf="@+id/SinPeticiones_textView"
+            android:layout_toStartOf="@+id/SinPeticiones_textView"
+            android:background="@drawable/boton_redondo2"
+            android:drawableLeft="@drawable/botoncancel"
+            android:text="Rechazar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCuatro"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewCinco"
+            app:layout_constraintRight_toLeftOf="@+id/buttonCuatroAceptar"
+            android:layout_marginRight="8dp"
+            app:layout_constraintHorizontal_bias="0.006" />
+
+        <Button
+            android:id="@+id/buttonCuatroAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignLeft="@+id/buttonTresAceptar"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignStart="@+id/buttonTresAceptar"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/boton_redondo1"
+            android:drawableLeft="@drawable/listo"
+            android:text="Aceptar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCuatro" />
+
+
+        <TextView
+            android:id="@+id/textViewCinco"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_text"
+            android:text="Sin Petición"
+            android:textAlignment="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonCuatroAceptar" />
+
+
+        <Button
+            android:id="@+id/buttonCincoAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+
+            android:background="@drawable/boton_redondo1"
+            android:drawableLeft="@drawable/listo"
+            android:text="Aceptar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+
+            app:layout_constraintTop_toBottomOf="@+id/textViewCinco"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/buttonCincoRechazar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+
+
+
+            android:background="@drawable/boton_redondo2"
+            android:drawableLeft="@drawable/botoncancel"
+            android:text="Rechazar"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+
+            app:layout_constraintTop_toBottomOf="@+id/textViewCinco"
+            app:layout_constraintRight_toLeftOf="@+id/buttonCincoAceptar"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+
+        <TextView
+            android:id="@+id/textViewUno"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_text"
+            android:text="Sin Petición"
+            android:textAlignment="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/SinPeticiones_textView" />
+
+
+        <TextView
+            android:id="@+id/SinPeticiones_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:elevation="1dp"
+            android:text="En espera de peticiones"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_bias="1.0" />
+
+
+        <TextView
+            android:id="@+id/textViewTres"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Sin Petición"
+            android:background="@drawable/border_text"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/buttonDosAceptar" />
+
+
+        <TextView
+            android:id="@+id/textViewCuatro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_text"
+            android:text="Sin Petición"
+            android:textAlignment="center"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/buttonTresAceptar" />
+
+
+        <TextView
+            android:id="@+id/textViewDos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_text"
+            android:text="Sin Petición"
+            android:textAlignment="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonUnoAceptar" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>

@@ -1,10 +1,16 @@
 package com.example.zzzclcik.pruebafirebase;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +19,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,6 +27,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,11 +39,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-public class DetalleTaxis extends AppCompatActivity {
-    private TextView Nombre2,Coordenadas2,Lat,Lon,placasText,comentariosTxt;
+public class DetalleTaxis extends AppCompatActivity implements View.OnClickListener{
+    private TextView Nombre2,placasText,comentariosTxt,calificacion;
     private RatingBar bar;
     private ImageView foto;
     private Button mandar;
@@ -41,25 +52,47 @@ public class DetalleTaxis extends AppCompatActivity {
     String placas ;
     String idTaxi;
     private FirebaseAuth mAuth;
-    String peticion1,peticion2,peticion3,peticion4,peticion5;
-    String nomU,latU,lonU;
-    String nomP1,nomP2,nomP3,nomP4,nomP5;
+    String latU,lonU;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
     public String idUsusario,union,union2;
-    public boolean auxBtn,auxEnvio=false;
-    String Rating="0#0",CometarioUlt;
-    int numComentario;
+    String Rating="0",CometarioUlt;
+    ArrayList<String> ArraynumeroComentarios=new ArrayList<>();
+    ValueEventListener listener1, listener2;
+    ValidatorUtil validatorUtil = null;
+
+    private ShowcaseView showcaseView;
+    private int contador=0;
+    private Target t1,t2,t3,t4,t5,t6,t7;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
-        idUsusario=getIntent().getStringExtra("idUsuario");
+        getSupportActionBar().setTitle("Detalle de taxis");
+        validatorUtil = new ValidatorUtil(getApplicationContext());
+        String carpetaFuente = "fonts/Graphik-Bold.otf";
+        Typeface fuente = Typeface.createFromAsset(getAssets(), carpetaFuente);
+
+        try {
+            idUsusario=getIntent().getStringExtra("idUsuario");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         setContentView(R.layout.activity_detalle_taxis);
-        String Nombre = getIntent().getStringExtra("nombre");
-        String Coordenadas = getIntent().getStringExtra("posicion");
-        String snipe = getIntent().getStringExtra("foto");
+        String Nombre = null;
+        String snipe = null;
+        try {
+            Nombre = getIntent().getStringExtra("nombre");
+            snipe = getIntent().getStringExtra("foto");
+            latU = getIntent().getStringExtra("latitud");
+            lonU = getIntent().getStringExtra("longitud");
+            union = Nombre;
+            union2 = snipe;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         StringTokenizer st = new StringTokenizer(snipe, "|");
          imageUrl = st.nextToken();
@@ -73,519 +106,377 @@ public class DetalleTaxis extends AppCompatActivity {
         placasText=(TextView)findViewById(R.id.PlacastextView);
         mandar=(Button)findViewById(R.id.MandarSolicitudBtn);
         comentariosTxt=(TextView)findViewById(R.id.comentariostextView);
+        calificacion = (TextView)findViewById(R.id.textView13);
+
+        Nombre2.setTypeface(fuente);
+        placasText.setTypeface(fuente);
+        mandar.setTypeface(fuente);
+        comentariosTxt.setTypeface(fuente);
+        calificacion.setTypeface(fuente);
+
+
+        t1= new ViewTarget(R.id.NombreTextView, this);
+        t2= new ViewTarget(R.id.PerfilimageView, this);
+        t3= new ViewTarget(R.id.PlacastextView, this);
+        t4= new ViewTarget(R.id.scrollView2, this);
+        t5= new ViewTarget(R.id.textView13, this);
+        t6= new ViewTarget(R.id.ratingBarTaxis, this);
+        t7= new ViewTarget(R.id.MandarSolicitudBtn, this);
+        ///////////////////////////////////////////////////////////////////////////////////////////
+//Obtiene valor de preferencia (la primera ocasión es por default true).
+        boolean muestra2 = getValuePreference(getApplicationContext());
+
+
+
+
+        ////////////////////////////////////Inicio////////////////////////////////////////////////////////
+        showcaseView=new ShowcaseView.Builder(this)
+                .setTarget(Target.NONE)
+                .setOnClickListener(this)
+                .setContentTitle("Bienvenido")
+                .setContentText("Vamos a comenzar")
+                .setStyle(R.style.Transparencia)
+                .build();
+        showcaseView.setButtonText("Siguiente");
+        //Aqui se construye el showCaseView
+        ////////////////////////////////////Fin////////////////////////////////////////////////////////////
+        ////////////////////////Inicio_______///////////////////////////////////////////
+        //aqui si no es la primera vez que se abre la activity se oculta el showCaseView
+        if(!muestra2){
+
+            saveValuePreference(getApplicationContext(), false);
+            contador=7;
+            showcaseView.hide();
+
+        }
+        /////////////////////////Fin_______/////////////////////////////////////////////
+
+        bar.setEnabled(false);
 
         Nombre2.setText(Nombre);
         placasText.setText("No. de placas\n"+placas);
-
-        //bar.setNumStars(5);
-        //bar.setRating(5);
-        System.out.println(Nombre+"0000000000000000000000"+imageUrl+"\n000000000000"+placas);
 
         if(!imageUrl.equals("default")|| imageUrl!=null)
         {
             Picasso.with(DetalleTaxis.this).load(Uri.parse(imageUrl)).into(foto);
         }else{System.out.println("imageUrl="+imageUrl);}
 
-
-mandar.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        obtenerPeticiones();
-        if (ConexionInternet())
-        {
-            ChekarPeticiones();
-
-
-        System.out.println("Usuario Peticion/////////////////////////////////////////////////////////////\n");
-        System.out.println(nomP1);
-        System.out.println(nomP2);
-        System.out.println(nomP3);
-        System.out.println(nomP4);
-        System.out.println(nomP5);
-        System.out.println("AQUI ACABA /////////////////////////////////////////////////////////////\n");
-
-            String cadenaUsuario = nomU;
-            if (cadenaUsuario.equals(nomP1) || cadenaUsuario.equals(nomP2) || cadenaUsuario.equals(nomP3) || cadenaUsuario.equals(nomP4) || cadenaUsuario.equals(nomP5))
-            {
-                Toast.makeText(getApplicationContext(), "Tu petición ya fue enviada anteriormente", Toast.LENGTH_SHORT).show();
+    mandar.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (validatorUtil.isOnline()) {
+                Intent intent = new Intent(DetalleTaxis.this, Destino.class);
+                intent.putExtra("idTaxi",idTaxi);
+                intent.putExtra("idUsuario", idUsusario);
+                intent.putExtra("nombre",union);
+                intent.putExtra("foto",union2);
+                finish();
+                startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
             }
             else
-            {
-                mandarSolicitud();
-            }
-
-
-    }
-
-    }
-});
+                Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
+        }
+    });
 
 
     }
 
     @Override
     protected void onStart() {
+        super.onStart();
         obtenerPeticiones();
-        obtenerDatosUsuario();
         ObtenerComentarios();
-        super.onStart(); mAuth=FirebaseAuth.getInstance();
+        bar.setEnabled(false);
 
-
-
+        try {
+                mAuth=FirebaseAuth.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println("id del Taxi es: "+idTaxi);
-
-        System.out.println("PETICION/////////////////////////////////////////////////////////////\n"+peticion1);
-        System.out.println(peticion2);
-        System.out.println(peticion3);
-        System.out.println(peticion4);
-        System.out.println(peticion5);
-        System.out.println("AQUI ACABA /////////////////////////////////////////////////////////////\n");
-
-        System.out.println("Usuario/////////////////////////////////////////////////////////////\n");
-        System.out.println("ID:"+idUsusario);
-        System.out.println(nomU);
-        System.out.println(latU);
-        System.out.println(lonU);
-        System.out.println("AQUI ACABA /////////////////////////////////////////////////////////////\n");
-
-
-    }
-    public void ChekarPeticiones()
-    {
-        StringTokenizer st1 = new StringTokenizer(peticion1, "#");
-        nomP1 = st1.nextToken();
-        StringTokenizer st2 = new StringTokenizer(peticion2, "#");
-        nomP2 = st2.nextToken();
-        StringTokenizer st3 = new StringTokenizer(peticion3, "#");
-        nomP3 = st3.nextToken();
-        StringTokenizer st4 = new StringTokenizer(peticion4, "#");
-        nomP4 = st4.nextToken();
-        StringTokenizer st5 = new StringTokenizer(peticion5, "#");
-        nomP5 = st5.nextToken();
     }
 
-    public int TiempoEspera()
-    {
-        Random random = new Random();
-        //int op = (int)Math.floor(Math.random()*10);}
-        int op = random.nextInt(10);
-
-        int time = 0;
-        switch (op)
-        {
-            case 0:
-                time = 500;
-                break;
-            case 1:
-                time = 1000;
-                break;
-            case 2:
-                time = 1500;
-                break;
-            case 3:
-                time = 2000;
-                break;
-            case 4:
-                time = 2500;
-                break;
-            case 5:
-                time = 3000;
-                break;
-            case 6:
-                time = 3500;
-                break;
-            case 7:
-                time = 4000;
-                break;
-            case 8:
-                time = 4500;
-                break;
-            case 9:
-                time = 5000;
-                break;
-        }
-        return time;
-
-    }
     public void obtenerPeticiones()
     {
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
+        if (validatorUtil.isOnline()) {
+            try {
+                    mDatabase = FirebaseDatabase.getInstance().getReference().child("taxis").child(idTaxi);
 
-        mDatabase.child(idTaxi).addValueEventListener(new ValueEventListener()
-        {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                peticion1= dataSnapshot.child("peticion1").getValue().toString();
-                peticion2= dataSnapshot.child("peticion2").getValue().toString();
-                peticion3= dataSnapshot.child("peticion3").getValue().toString();
-                peticion4= dataSnapshot.child("peticion4").getValue().toString();
-                peticion5= dataSnapshot.child("peticion5").getValue().toString();
-                Rating= dataSnapshot.child("rating").getValue().toString();
-                System.out.println(Rating+"#############################");
-                getRating();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-
-      /* try {
-        Thread.sleep(TiempoEspera());
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-    }*////
-
-    }
-    public void obtenerPeticiones2()
-    {
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
-
-        mDatabase.child(idTaxi).addValueEventListener(new ValueEventListener()
-        {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                peticion1= dataSnapshot.child("peticion1").getValue().toString();
-                peticion2= dataSnapshot.child("peticion2").getValue().toString();
-                peticion3= dataSnapshot.child("peticion3").getValue().toString();
-                peticion4= dataSnapshot.child("peticion4").getValue().toString();
-                peticion5= dataSnapshot.child("peticion5").getValue().toString();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-
-    }
-
-
-
-    public void obtenerDatosUsuario()
-    {
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
-        mDatabase.child(idUsusario).addListenerForSingleValueEvent(new ValueEventListener()
-        {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-              nomU=dataSnapshot.child("name").getValue().toString();
-              latU=dataSnapshot.child("latitud").getValue().toString();
-              lonU=dataSnapshot.child("longitud").getValue().toString();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {Toast.makeText(getApplicationContext(),"error Base", Toast.LENGTH_SHORT).show();}
-        });
-    }
-
-
-
-
-   public void  mandarSolicitud()
-    {
-union=nomU+"#"+latU+"#"+lonU+"#"+idUsusario;
-        boolean aux=false;
-
-        DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
-        DatabaseReference currentUserBD2=mDatabase.child(idTaxi);
-        DatabaseReference mDatabase2= FirebaseDatabase.getInstance().getReference().child("users");
-        DatabaseReference currentUserBD22=mDatabase2.child(idUsusario);
-
-        System.out.println("Aqui______________");
-        System.out.println("-----------------------"+peticion1+" "+peticion2+" "+peticion3+" "+peticion4+" "+peticion5);
-
-        obtenerPeticiones();
-        if(peticion1.equals("123"))
-        {
-
-            union2=union+"#1";
-            currentUserBD2.child("peticion1").setValue(union+"#1");auxEnvio=true;
-            currentUserBD22.child("estado").setValue("1");auxEnvio=true;
-            System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-            System.out.println("-----------------------"+peticion1+" "+peticion2+" "+peticion3+" "+peticion4+" "+peticion5);
-            Toast.makeText(getApplicationContext(),"Petición  enviada", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(DetalleTaxis.this,EsperaServicio.class);
-            intent.putExtra("idTaxi",idTaxi);
-            intent.putExtra("union",union2);
-            System.out.println("222222222UNION   "+union2);
-            startActivity(intent);
-
-
-        }else
-        {obtenerPeticiones2();
-
-            if(peticion2.equals("123"))
-            {
-                obtenerPeticiones();
-                union2=union+"#2";
-               currentUserBD2.child("peticion2").setValue(union+"#2");auxEnvio=true;
-                currentUserBD22.child("estado").setValue("1");auxEnvio=true;
-                Toast.makeText(getApplicationContext(),"Petición  enviada", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(DetalleTaxis.this,EsperaServicio.class);
-                intent.putExtra("idTaxi",idTaxi);
-                intent.putExtra("union",union2);
-                System.out.println("222222222UNION   "+union2);
-                startActivity(intent);
-            }else
-            {
-                obtenerPeticiones();
-                if(peticion3.equals("123"))
-                {                    union2=union+"#3";
-                    currentUserBD2.child("peticion3").setValue(union+"#3");auxEnvio=true;
-                    currentUserBD22.child("estado").setValue("1");auxEnvio=true;
-                    Toast.makeText(getApplicationContext(),"Petición  enviada", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(DetalleTaxis.this,EsperaServicio.class);
-                    intent.putExtra("idTaxi",idTaxi);
-                    intent.putExtra("union",union2);
-                    System.out.println("222222222UNION   "+union2);
-                    startActivity(intent);
-                }else
-                {
-                    obtenerPeticiones();
-                    if(peticion4.equals("123"))
+                    listener1 = mDatabase.addValueEventListener(new ValueEventListener()
                     {
 
-                        union2=union+"#4";
-                        currentUserBD2.child("peticion4").setValue(union+"#4");auxEnvio=true;
-                        currentUserBD22.child("estado").setValue("1");auxEnvio=true;
-                        Toast.makeText(getApplicationContext(),"Petición  enviada", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(DetalleTaxis.this,EsperaServicio.class);
-                        intent.putExtra("idTaxi",idTaxi);
-                        intent.putExtra("union",union2);
-                        System.out.println("222222222UNION   "+union2);
-                        startActivity(intent);
-                    }
-                    else
-                    {
-                        obtenerPeticiones();
-                        if(peticion5.equals("123"))
-                        { union2=union+"#5";
-                            currentUserBD2.child("peticion5").setValue(union+"#5");auxEnvio=true;
-                            currentUserBD22.child("estado").setValue("1");auxEnvio=true;
-                            Toast.makeText(getApplicationContext(),"Petición  enviada", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(DetalleTaxis.this,EsperaServicio.class);
-                            intent.putExtra("idTaxi",idTaxi);
-                            intent.putExtra("union",union2);
-                            System.out.println("222222222UNION   "+union2);
-                            startActivity(intent);
-                        }else
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot)
                         {
-                            Toast.makeText(DetalleTaxis.this, "Este taxi tiene muchas peticiones", Toast.LENGTH_SHORT).show();
+                            Rating= dataSnapshot.child("rating").getValue().toString();
+                            getRating();
                         }
-                    }
-                }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
-
-
-
-    }
-
-    public boolean ConexionInternet()
-    {
-        ConnectivityManager conect =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-        if ((conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
-                (conect.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING))
-        {
-            return true;
         }
         else
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Conexión a Internet");
-            builder.setMessage("No estás conectado a Internet");
-            builder.setPositiveButton("Aceptar",null);
-            builder.show();
-            return false;
-        }
+            Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
     }
+
     public void getRating()
     {
-        StringTokenizer token = new StringTokenizer(Rating, "#");
-        System.out.println(Rating+"$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        float rat = Float.parseFloat(token.nextToken());
-        int num = Integer.parseInt(token.nextToken());
-        float prom = rat/num;
-        bar.setRating(prom);
-        bar.setEnabled(false);
-        System.out.println("Rating actual " + prom + " #" + num);
+        try {
+            double rating = Double.parseDouble(Rating);
+            if(rating == 0)
+            {
+                calificacion.setText("Aún no tiene calificación");
+                calificacion.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                bar.setEnabled(false);
+            }
+            else
+            {
+                calificacion.setText(String.valueOf(rating));
+                calificacion.setTextSize(TypedValue.COMPLEX_UNIT_SP, 36);
+                bar.setRating((float)rating);
+                bar.setEnabled(false);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
     public void ObtenerComentarios()
     {
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
-        mDatabase=mDatabase.child(idTaxi);
+        if (validatorUtil.isOnline()) {
+            try {
+                    mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
+                    mDatabase = mDatabase.child(idTaxi);
 
-        mDatabase.child("comentarios").limitToLast(10).addValueEventListener(new ValueEventListener()
-        {
+                    listener2 = mDatabase.child("comentarios").limitToLast(10).orderByKey().addValueEventListener(new ValueEventListener()
+                    {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot)
+                        {
+                            CometarioUlt= dataSnapshot.getValue().toString();
+                            System.out.println("All    "+CometarioUlt);
+
+                            CometarioUlt=CometarioUlt.replace("{1=Primer comentario}","[No hay comentarios");
+                            CometarioUlt=CometarioUlt.replace("{2=Primer comentario}","[ ");
+                            CometarioUlt=CometarioUlt.replace("Primer comentario"," ");
+
+                            System.out.println(CometarioUlt.length()+"Tamaño");
+                            System.out.println(CometarioUlt+" Despues");
+                            StringTokenizer token4 = new StringTokenizer(CometarioUlt, "[");
+                            CometarioUlt=token4.nextToken();
+
+                            CometarioUlt=CometarioUlt.replaceAll("","");
+                            CometarioUlt=CometarioUlt.replaceAll("]","");
+                            CometarioUlt= CometarioUlt.replaceAll("null","");
+                            CometarioUlt= CometarioUlt.replaceAll("null,","");
+
+                            StringTokenizer token = new StringTokenizer(CometarioUlt, ",");
+                            int numTokens=token.countTokens();
+                            System.out.println(numTokens+" Numero de tokens");
+                            if(numTokens>10)
+                            {
+                                System.out.println("Entro al if");
+                                int numComentarios=numTokens-10;
+                                System.out.println(numComentarios+" comentarios de mas");
+                                int cont=0;
+
+
+                                System.out.println(ArraynumeroComentarios.size()+" Tamaño del arrayList");
+                                for (int i=numComentarios;i<ArraynumeroComentarios.size();i++)
+                                {
+                                    CometarioUlt+=ArraynumeroComentarios.get(i);
+                                    System.out.println(i+" 2222");
+                                }
+                            }
+                            CometarioUlt=CometarioUlt.replaceAll("#","\n");
+                            CometarioUlt=CometarioUlt.replaceAll(",","\n\n");
+                            CometarioUlt=CometarioUlt.replaceAll(" \n\n","");
+
+                            System.out.println("!!!!!!!!!!!!!!!!!!!!!!\n"+CometarioUlt+" \nAquiiiiiiiiiiiiiiiii");
+                            comentariosTxt.setText(CometarioUlt);
+
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+                    System.out.println("Si entra}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }catch (Exception ex)
             {
-                CometarioUlt= dataSnapshot.getValue().toString();
-                System.out.println("All    "+CometarioUlt);
-
-                CometarioUlt=CometarioUlt.replace("{2=Primer comentario}","");
-
-                System.out.println(CometarioUlt.length());
-                StringTokenizer token4 = new StringTokenizer(CometarioUlt, "[");
-                CometarioUlt=token4.nextToken();
-
-//CometarioUlt=CometarioUlt.substring(1,comentariosTxt.length()+1);
-                CometarioUlt=CometarioUlt.replaceAll("","");
-                CometarioUlt=CometarioUlt.replaceAll("]","");
-                CometarioUlt= CometarioUlt.replaceAll("null","");
-                CometarioUlt=CometarioUlt.replaceAll("#","\n");
-                CometarioUlt=CometarioUlt.replaceAll(",","\n\n");
-                System.out.println("!!!!!!!!!!!!!!!!!!!!!!\n"+CometarioUlt+" \nAquiiiiiiiiiiiiiiiii");
-                StringTokenizer token = new StringTokenizer(CometarioUlt, ",");
-                int numTokens=token.countTokens();
-                /*
-                String comemtario1,comemtario2,comemtario3,comemtario4,comemtario5,comemtario6,comemtario7,comemtario8,comemtario9,comemtario10;
-                switch (numTokens) {
-                    case 1:
-                        comemtario1=token.nextToken();
-                        System.out.println(comemtario1);
-                          break;
-                    case 2:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2);
-                        break;
-                    case 3:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3);
-                        break;
-                    case 4:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4);
-                        break;
-                    case 5:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"  5");
-                        break;
-                    case 6:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-                        comemtario6=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
-                                +comemtario6+"  6");
-                        break;
-                    case 7:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-                        comemtario6=token.nextToken();
-                        comemtario7=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
-                                +comemtario6+"\n "+comemtario7+"  7");
-                        break;
-                    case 8:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-                        comemtario6=token.nextToken();
-                        comemtario7=token.nextToken();
-                        comemtario8=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
-                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8);
-                        break;
-                    case 9:
-                        comemtario1=token.nextToken();
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-                        comemtario6=token.nextToken();
-                        comemtario7=token.nextToken();
-                        comemtario8=token.nextToken();
-                        comemtario9=token.nextToken();
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
-                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8+"\n "+comemtario9+"\n "+"\n "
-                        );
-                        break;
-                    case 10:
-                        comemtario1=token.nextToken();
-
-
-                        comemtario2=token.nextToken();
-                        comemtario3=token.nextToken();
-                        comemtario4=token.nextToken();
-                        comemtario5=token.nextToken();
-                        comemtario6=token.nextToken();
-                        comemtario7=token.nextToken();
-                        comemtario8=token.nextToken();
-                        comemtario9=token.nextToken();
-                        comemtario10=token.nextToken();
-
-
-                        System.out.println(comemtario1+"\n "+comemtario2+"\n "+comemtario3+"\n "+comemtario4+"\n "+comemtario5+"\n "
-                                +comemtario6+"\n "+comemtario7+"\n "+comemtario8+"\n "+comemtario9+"\n "+comemtario10+"\n "
-                        );
-                        break;
-                    default:
-
-                        break;
-
-                }*/
-
-
-
-                if(CometarioUlt!=null)
-                {
-                    final SpannableStringBuilder texto= new SpannableStringBuilder("Osiel Rios Escorcia\ntaxi muy sucio");
-                    final SpannableStringBuilder texto2= new SpannableStringBuilder("Osiel Rios Escorcia\ntaxi muy sucio");
-                    StringTokenizer token2 = new StringTokenizer(texto.toString(), "\n");//aqui hacemos el token hasta \n para extraer el nombre
-                    StringTokenizer token3 = new StringTokenizer(texto2.toString(), "\n");//aqui hacemos el token hasta \n para extraer el nombre
-                    String comentTam=token2.nextToken();//extraigo el nombre de usuario para convertirlo a String
-
-                    final StyleSpan letraEnNegrita= new StyleSpan(android.graphics.Typeface.BOLD); // Para hacer negrita
-                    texto.setSpan(letraEnNegrita, 0, comentTam.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);// Convierte los primeros caracteres en negrita pero tomando el tamaño del sTRING nombreUsuario, tu puedes decirle cuantos caracteres :)
-                    texto2.setSpan(letraEnNegrita, 0, comentTam.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);// Convierte los primeros caracteres en negrita pero tomando el tamaño del sTRING nombreUsuario, tu puedes decirle cuantos caracteres :)
-                    comentariosTxt.setText(CometarioUlt);//mandamos el texto al tEXTvIEW
-
-                }else{Toast.makeText(DetalleTaxis.this,"Verifique su conexion",Toast.LENGTH_SHORT).show();}
-
+                ex.printStackTrace();
             }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-        System.out.println("Si entra}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+        }
+        else
+            Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (listener1 != null && listener2 != null) {
+            mDatabase.removeEventListener(listener1);
+            mDatabase.removeEventListener(listener2);
+        }
+        Intent i = new Intent(getApplicationContext(),MapsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        i.putExtra("latitud",latU);
+        i.putExtra("longitud",lonU);
+        i.putExtra("idUsuario",idUsusario);
+        finish();
+        startActivity(i);
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
+    }
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ValidatorUtil validatorUtil = new ValidatorUtil(context);
+            if (!validatorUtil.isOnline())
+            {
+                Toast.makeText(context,"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    public void onPause() {
+        unregisterReceiver(networkStateReceiver);
+        super.onPause();
+        if (listener1 != null && listener2 != null) {
+            mDatabase.removeEventListener(listener1);
+            mDatabase.removeEventListener(listener2);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (listener1 != null && listener2 != null) {
+            mDatabase.removeEventListener(listener1);
+            mDatabase.removeEventListener(listener2);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (listener1 != null && listener2 != null) {
+            mDatabase.removeEventListener(listener1);
+            mDatabase.removeEventListener(listener2);
+        }
+    }
+
+
+
+    ///////////////////////////////////////Para el showCaseView por primera vez__Inicio///////////////////////////////////////////
+    private String PREFS_KEY = "mispreferencias";
+
+    public void saveValuePreference(Context context, Boolean mostrar) {
+        SharedPreferences settings = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        editor.putBoolean("DetalleTaxi", mostrar);
+        editor.commit();
+    }
+
+
+
+    public boolean getValuePreference(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getBoolean("DetalleTaxi", true);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (contador) {
+            case 0:
+                showcaseView.setShowcase(t1, true);
+                showcaseView.setContentTitle("Nombre del conductor");
+                showcaseView.setContentText("Aqui puedes vizualizar el nombre del taxista ");
+                break;
+            case 1:
+                showcaseView.setShowcase(t2, true);
+                showcaseView.setContentTitle("Foto de perfil");
+                showcaseView.setContentText("Aqui puedes vizualizar la foto del taxista");
+                break;
+            case 2:
+                showcaseView.setShowcase(t3, true);
+                showcaseView.setContentTitle("Placas");
+                showcaseView.setContentText("Aqui puedes vizualizar las placas del auto ");
+                break;
+            case 3:
+                showcaseView.setShowcase(t4, true);
+                showcaseView.setContentTitle("Comentarios");
+                showcaseView.setContentText("Aqui puedes vizualizar los comentarios que tiene ");
+                break;
+            case 4:
+                showcaseView.setShowcase(t5, true);
+                showcaseView.setContentTitle("Calificacion general");
+                showcaseView.setContentText("Aqui puedes vizualizar la calificacion exacta");
+                break;
+            case 5:
+                showcaseView.setShowcase(t6, true);
+                showcaseView.setContentTitle("Rating");
+                showcaseView.setContentText("Aqui puedes vizualizar rating ");
+                break;
+
+            case 6:
+                showcaseView.setShowcase(t7, true);
+                showcaseView.setContentTitle("Solicitudes");
+                showcaseView.setContentText("presione para enviar un peticion");
+                showcaseView.setButtonText("Finalizar");
+                break;
+
+            case 7:
+                showcaseView.hide();
+                boolean muestra2 = getValuePreference(getApplicationContext());
+                if(muestra2)
+                {
+                    saveValuePreference(getApplicationContext(), false);
+                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                showcaseView.hide();
+                boolean muestra21 = getValuePreference(getApplicationContext());
+                if(muestra21)
+                {
+                    saveValuePreference(getApplicationContext(), false);
+                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+
+        contador++;
+    }
+
+    /////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
+    public  void Ayuda()
+    {
+        contador=0;
+        showcaseView.show();
+        showcaseView.setTarget(Target.NONE);
+        showcaseView.setContentTitle("Bienvenido");
+        showcaseView  .setContentText("Vamos a comenzar");
+        showcaseView.setButtonText("Siguiente");
+    }
+    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
+
+    ///////////////////////////////////////Para el showCaseView por primera vez___Fin///////////////////////////////////////////
+
 }
