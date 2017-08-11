@@ -91,6 +91,7 @@ public class EnviarATodos extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.left_in, R.anim.left_in);
         setContentView(R.layout.activity_enviar_atodos);
         getSupportActionBar().setTitle("Enviar peticiones");
         mAuth=FirebaseAuth.getInstance();
@@ -490,23 +491,26 @@ public void EnviarPeticion()
         {
             if(!despripcion.getText().toString().equals(""))
             {
-                String union;
-                String tiempo = TiempoTxt.getText().toString();
+                if (!TiempoTxt.getText().toString().equals("")||!TiempoTxt.getText().toString().isEmpty())
+                {
+                    String union;
+                    String tiempo = TiempoTxt.getText().toString();
 
-                System.out.println("Aqui "+TiempoTxt.getText());
-                union = latitudOrigen + "_" + longitudOrigen + "_" +  despripcion.getText().toString() + "_" + tiempo;
-                System.out.println("\n\n" + union + "\n\n");
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("peticiones");
-                mDatabase.child(id_Usuario).setValue(union);
-                Toast toast3=Toast.makeText(this,"Toast:Gravity.TOP",Toast.LENGTH_SHORT);
-                toast3.setGravity(Gravity.CENTER,0,0);
-                toast3.setView(viewLayout2);
-                toast3.show();
+                    System.out.println("Aqui "+TiempoTxt.getText());
+                    union = latitudOrigen + "_" + longitudOrigen + "_" +  despripcion.getText().toString() + "_" + tiempo;
+                    System.out.println("\n\n" + union + "\n\n");
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("peticiones");
+                    mDatabase.child(id_Usuario).setValue(union);
+                    Toast toast3=Toast.makeText(this,"Toast:Gravity.TOP",Toast.LENGTH_SHORT);
+                    toast3.setGravity(Gravity.CENTER,0,0);
+                    toast3.setView(viewLayout2);
+                    toast3.show();
 
-                Intent intent = new Intent(getApplicationContext(),EsperaTaxis.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                finish();
-                startActivity(intent);
-                overridePendingTransition(R.anim.right_in, R.anim.right_out);
+                    Intent intent = new Intent(getApplicationContext(),EsperaTaxis.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    finish();
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.right_in, R.anim.right_out);
+                }else{Toast.makeText(getApplicationContext(),"Calculando tiempo", Toast.LENGTH_SHORT).show();despripcion.setError("Describe el lugar donde te encuentras");}
             }else{Toast.makeText(getApplicationContext(),"Por favor describe tu ubicacion", Toast.LENGTH_SHORT).show();despripcion.setError("Describe el lugar donde te encuentras");}
         }
     else{Toast.makeText(getApplicationContext(),"ubicacion desconocida intentelo de nuevo\nmas tarde", Toast.LENGTH_SHORT).show();}
@@ -542,5 +546,12 @@ public void EnviarPeticion()
         mDatabaseCordenadas.addValueEventListener(listenerCoordenadas);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
+
+    }
 }
 

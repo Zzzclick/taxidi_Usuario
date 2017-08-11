@@ -24,9 +24,6 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.Target;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -68,10 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     View viewLayout,viewLayout2;
     DatabaseReference ref2;
     DatabaseReference mensajeRef2;
-    private ShowcaseView showcaseView;
     private int contador=0;
-    private Target t5;
-
+    ValidatorUtil validatorUtil = null;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -81,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     String id,emailF,nameF;
 
-    ValidatorUtil validarConexion = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         overridePendingTransition(R.anim.right_in,R.anim.right_out);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Iniciar Sesión");
-        validarConexion = new ValidatorUtil(getApplicationContext());
+        validatorUtil = new ValidatorUtil(getApplicationContext());
 
         LayoutInflater layoutInflater = getLayoutInflater();
         viewLayout = layoutInflater.inflate(R.layout.custom_toast_sininternet,(ViewGroup)findViewById(R.id.custom_layout2));
@@ -121,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         try {
-            t5= new ViewTarget(R.id.login_button, this);
+
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
         }
@@ -132,28 +126,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-        ////////////////////////////////////Inicio////////////////////////////////////////////////////////
-        try {
-            showcaseView=new ShowcaseView.Builder(this)
-                    .setTarget(Target.NONE)
-                    .setOnClickListener(this)
-                    .setContentTitle("Bienvenido")
-                    .setContentText("Vamos a comenzar")
-                    .setStyle(R.style.Transparencia)
-                    .build();
-            showcaseView.setButtonText("Siguiente");
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-        }
-        //Aqui se construye el showCaseView
-       ////////////////////////////////////Fin////////////////////////////////////////////////////////////
-        ////////////////////////Inicio_______///////////////////////////////////////////
-        //aqui si no es la primera vez que se abre la activity se oculta el showCaseView
         if(!muestra){
 
             saveValuePreference(getApplicationContext(), false);
             contador=5;
-            showcaseView.hide();
 
         }
         /////////////////////////Fin_______/////////////////////////////////////////////
@@ -279,19 +255,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-                                            if(estado.equals("1")){
+                                            if(!ValorViaje.equals("0#vacio")){
                                                 ////
                                                 SiEstaEnViaje=true;
                                             }
                                             if(SiEstaEnViaje)
                                             {
-                                                Intent intent = new Intent(getApplicationContext(),MapsActivityTaxi.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                                intent.putExtra("idTaxi",idTaxi);
-                                                intent.putExtra("idUsuario",idUsuario);
-                                                System.out.println("Cargando datos de viaje\n"+idTaxi+" \n"+idUsuario);
-                                                startActivity(intent);
-                                                Toast.makeText(getApplicationContext(),"Cargando datos de viaje", Toast.LENGTH_SHORT).show();
-
+                                                if (validatorUtil.isOnline()) {
+                                                    Intent intent = new Intent(getApplicationContext(),MapsActivityTaxi.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                                    intent.putExtra("idTaxi",idTaxi);
+                                                    intent.putExtra("idUsuario",idUsuario);
+                                                    System.out.println("Cargando datos de viaje\n"+idTaxi+" \n"+idUsuario);
+                                                    startActivity(intent);
+                                                    Toast.makeText(getApplicationContext(),"Cargando datos de viaje", Toast.LENGTH_SHORT).show();
+                                                }else Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
                                             }
 
                                         }
@@ -394,11 +371,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         System.out.println("id "+id+" QQQ "+currentUserBD);
             currentUserBD.child("name").setValue(nameF);
             currentUserBD.child("email").setValue(emailF);
-            currentUserBD.child("estado").setValue("0");
-            currentUserBD.child("image").setValue("default");
-            currentUserBD.child("ViajeA").setValue("0#vacio");
-            currentUserBD.child("sesion").setValue("Facebook");
-            currentUserBD.child("telefono").setValue("no");
 
             DatabaseReference currentUserBD2 = FirebaseDatabase.getInstance().getReference().child("tipo");
             currentUserBD2.child(id).setValue("usuario");
@@ -461,28 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ///////////////////////////////////////////////OnClickEscuchador/////////////////////////////////////////////////////////////////
     @Override
     public void onClick(View v) {
-        switch (contador) {
 
-            case 0:
-                showcaseView.setShowcase(t5, true);
-                showcaseView.setContentTitle("Entrar con facebook");
-                showcaseView.setContentText("presiona el botón para registrarse o ingresar con tu perfil de facebook");
-                showcaseView.setButtonText("Finalizar");
-                break;
-
-            case 1:
-                showcaseView.hide();
-                boolean muestra = getValuePreference(getApplicationContext());
-                if(muestra)
-                {
-                    saveValuePreference(getApplicationContext(), false);
-                  //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-
-                break;
-        }
 
         contador++;
 
@@ -510,17 +461,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return  preferences.getBoolean("SiCalifico",false);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
-    public  void Ayuda()
-    {
-        contador=0;
-        showcaseView.show();
-        showcaseView.setTarget(Target.NONE);
-        showcaseView.setContentTitle("Bienvenido");
-        showcaseView.setContentText("Vamos a comenzar");
-        showcaseView.setButtonText("Siguiente");
-    }
-    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
-
 
 }

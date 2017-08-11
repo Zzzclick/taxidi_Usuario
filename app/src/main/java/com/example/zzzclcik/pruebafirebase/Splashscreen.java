@@ -21,6 +21,7 @@ public class Splashscreen extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_in);
         setContentView(R.layout.activity_splashscreen);
         StartAnimations();
     }

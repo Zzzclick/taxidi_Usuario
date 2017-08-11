@@ -71,6 +71,7 @@ public class EsperaTaxis extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.right_in, R.anim.right_in);
         setContentView(R.layout.activity_espera_taxis);
         validatorUtil = new ValidatorUtil(getApplicationContext());
         sonido = MediaPlayer.create(this, R.raw.tono);
@@ -79,7 +80,6 @@ public class EsperaTaxis extends AppCompatActivity {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(EsperaTaxis.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_detalles_taxi, null);
         getSupportActionBar().setTitle("Bandeja de peticiones");
-        validatorUtil = new ValidatorUtil(getApplicationContext());
         String carpetaFuente = "fonts/Graphik-Bold.otf";
         Typeface fuente = Typeface.createFromAsset(getAssets(), carpetaFuente);
 
@@ -406,8 +406,6 @@ public class EsperaTaxis extends AppCompatActivity {
     //////////////////////////////////////////////////////////______ObtenerPeticiones____________INICIO/////////////////////
     public void ObtenerPeticiones()
     {
-
-        if (validatorUtil.isOnline()) {
             try {
                 mDatabase= FirebaseDatabase.getInstance().getReference().child("users").child(MiId).child("peticiones");
                 listener2 = new ValueEventListener()
@@ -554,9 +552,6 @@ if(contenidoPeticiones==null){sinPet.setVisibility(View.VISIBLE);}
             {
                 ex.printStackTrace();
             }
-        }
-        else
-            Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
 
     }
 /////////////////////////////////////////////////////////_ObtenerPeticiones____________FIN////////////////////////////
@@ -762,20 +757,16 @@ HacerInvisible();
     }
     public void IniciarViaje()
     {
-
-        if (validatorUtil.isOnline())
-        {
-
             if(dialog2!=null)
             {
                 dialog2.dismiss();
             }
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-            DatabaseReference currentUserBD = mDatabase.child(MiId);
-            currentUserBD.child("ViajeA").setValue("1" + "#" + idTaxiA);
-            DatabaseReference mDatabase2 = FirebaseDatabase.getInstance().getReference().child("taxis");
-            DatabaseReference currentUserBD2 = mDatabase2.child(idTaxiA);
-            currentUserBD2.child("ViajeA").setValue("1#$" + MiId);
+            DatabaseReference mDatabaseViaje = FirebaseDatabase.getInstance().getReference().child("users");
+            DatabaseReference mDatabaseViaje2 = mDatabaseViaje.child(MiId);
+            mDatabaseViaje2.child("ViajeA").setValue("1" + "#" + idTaxiA);
+            DatabaseReference mDatabaseViaje3 = FirebaseDatabase.getInstance().getReference().child("taxis");
+            DatabaseReference mDatabaseViaje4 = mDatabaseViaje3.child(idTaxiA);
+            mDatabaseViaje4.child("ViajeA").setValue("1#$" + MiId);
 
             Intent intent = new Intent(EsperaTaxis.this, MapsActivityTaxi.class);
             intent.putExtra("idUsuario", MiId);
@@ -792,10 +783,7 @@ HacerInvisible();
             finish();
             startActivity(intent);
             overridePendingTransition(R.anim.left_in, R.anim.left_out);
-        }else
-            {
-                Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
-            }
+
     }
 
 
@@ -805,7 +793,6 @@ HacerInvisible();
     public void Validartaxi()
     {
 
-        if (validatorUtil.isOnline()) {
             try {
                 mDatabaseT= FirebaseDatabase.getInstance().getReference().child("taxis");
 
@@ -863,9 +850,6 @@ HacerInvisible();
             {
                 ex.printStackTrace();
             }
-        }
-        else
-            Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
 
     }
 /////////////////////////////////////////////////////////_ObtenerPeticiones____________FIN////////////////////////////
@@ -897,6 +881,7 @@ public void Salir()
         Intent intent = new Intent(getApplicationContext(),EnviarATodos.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
 
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
         Toast.makeText(getBaseContext(), "Saliendo", Toast.LENGTH_SHORT).show();
         if(dialog2!=null)
         {

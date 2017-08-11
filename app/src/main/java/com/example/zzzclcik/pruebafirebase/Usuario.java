@@ -39,9 +39,6 @@ import android.widget.Toast;
 import android.location.Location;
 import com.facebook.login.widget.LoginButton;
 import com.facebook.login.LoginManager;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.Target;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -75,7 +72,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     private int CAMERA_REGUEST_CODE=0;
     private ProgressDialog progressDialog;
     private StorageReference mStorage;
-    private DatabaseReference mDatabase,mDatabase2,mDatabaseCoord,mDatabaseUser;
+    private DatabaseReference mDatabase,mDatabase2,mDatabaseCoord,mDatabaseUser,mDatabaseViaje;
     private static final String LOGTAG = "android-localizacion";
     AlertDialog alert = null;
     public String latAux,lonAux="0";
@@ -86,10 +83,8 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     private GoogleApiClient apiClient;
     LocationManager locationManager;
     View viewLayout,viewLayout2;
-    private ShowcaseView showcaseView;
     private int contador=0;
-    private Target t1,t2,t3,t4,t5;
-    private Button enviarTodos;
+    private Button enviarTodos,noTel;
     private FirebaseAuth mAuth;
    EditText telefono ;
     Button botonRegistar;
@@ -97,7 +92,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition(R.anim.zoom_back_in,R.anim.zoom_back_out);
+        overridePendingTransition(R.anim.zoom_back_in,R.anim.right_in);
         setContentView(R.layout.activity_usuario);
         getSupportActionBar().setTitle("Inicio");
         mAuth=FirebaseAuth.getInstance();
@@ -127,15 +122,13 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 
         telefono = (EditText) mView.findViewById(R.id.TelEditText);
         botonRegistar = (Button) mView.findViewById(R.id.RegistarBoton2);
+        noTel = (Button) mView.findViewById(R.id.cancelBoton2);
 
         mBuilder.setView(mView);
 
         final AlertDialog dialog2 = mBuilder.create();
         dialog2.show();
         try {
-            t1= new ViewTarget(R.id.imageGps, this);
-            t2= new ViewTarget(R.id.imageView, this);
-            t3= new ViewTarget(R.id.login_button, this);
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
         }
@@ -155,7 +148,8 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 
         if(getValuePreference3(getApplicationContext()))
         {
-            dialog2.dismiss();}
+            dialog2.dismiss();
+        }
             botonRegistar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -177,7 +171,13 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                 }
             });
 
-
+noTel.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        dialog2.dismiss();
+        saveValuePreference3(getApplicationContext(),true);
+    }
+});
         ///////////////////////////////////////////////////////////////////////////////////////////
 //Obtiene valor de preferencia (la primera ocasión es por default true).
         boolean muestra2 = getValuePreference(getApplicationContext());
@@ -185,31 +185,12 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 
 
 
-        ////////////////////////////////////Inicio////////////////////////////////////////////////////////
-        try {
-            showcaseView=new ShowcaseView.Builder(this)
-                    .setTarget(Target.NONE)
-                    .setOnClickListener(this)
-                    .setContentTitle("Bienvenido")
-                    .setContentText("Vamos a comenzar")
-                    .setStyle(R.style.Transparencia)
-                    .build();
-            showcaseView.setButtonText("Siguiente");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }catch (OutOfMemoryError e) {
-            e.printStackTrace();
-        }
-        //Aqui se construye el showCaseView
-        ////////////////////////////////////Fin////////////////////////////////////////////////////////////
-        ////////////////////////Inicio_______///////////////////////////////////////////
+        ////////////////////////////////////Inicio/////////////////////////////
         //aqui si no es la primera vez que se abre la activity se oculta el showCaseView
         if(!muestra2){
 
             saveValuePreference(getApplicationContext(), false);
             contador=3;
-            showcaseView.hide();
-
         }
         /////////////////////////Fin_______/////////////////////////////////////////////
 
@@ -309,16 +290,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 ////////////////////////////////////////////////////////////
         try {
                 progressDialog=new ProgressDialog(this);
-            if (validatorUtil.isOnline()) {
+
                 mAuth=FirebaseAuth.getInstance();
-                mAuthListener=new FirebaseAuth.AuthStateListener() {
-                    @Override
-                    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                        if(firebaseAuth.getCurrentUser()!=null)
+               String miId=FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        if(miId!=null)
                         {
                             mStorage= FirebaseStorage.getInstance().getReference();
                             mDatabase= FirebaseDatabase.getInstance().getReference().child("users");
-                            mDatabase.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                            mDatabase.child(miId).addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -345,16 +324,8 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                             startActivity(i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
                             overridePendingTransition(R.anim.right_in, R.anim.right_out);
                              }
-                    }
-                };
-            }
-            else
-                {
-                    Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_SHORT);
-                    customToast.setGravity(Gravity.CENTER,0,0);
-                    customToast.setView(viewLayout);
-                    customToast.show();
-                }
+
+
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -364,15 +335,16 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         imagenTaxi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (validatorUtil.isOnline()) {
 
+
+                if (validatorUtil.isOnline()) {
                     if(getValuePreference3(getApplicationContext()))
                     {
                         Intent i = new Intent(getApplicationContext(),EnviarATodos.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         i.putExtra("latitud",latAux);
                         i.putExtra("longitud",lonAux);
                         i.putExtra("idUsuario",idUsusario);
-                        finish();
+                        //finish();
                         startActivity(i);
                         overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     }else
@@ -380,14 +352,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                             Toast.makeText(getApplicationContext(),"Debe registrar su  numero celular", Toast.LENGTH_SHORT).show();
                             dialog2.show();
                         }
+                } else
+                {
+                    Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_SHORT);
+                    customToast.setGravity(Gravity.CENTER,0,0);
+                    customToast.setView(viewLayout);
+                    customToast.show();
                 }
-                else
-                    {
-                        Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_SHORT);
-                        customToast.setGravity(Gravity.CENTER,0,0);
-                        customToast.setView(viewLayout);
-                        customToast.show();
-                    }
+
             }
         });
 
@@ -397,13 +369,14 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
       public void onClick(View v) {
           //mDatabase.removeEventListener(even);
 
-          Intent i = new Intent(Usuario.this, EnviarATodos.class );
-          i.putExtra("latitud",latAux);
-          i.putExtra("longitud",lonAux);
-          i.putExtra("idUsuario",idUsusario);
-          finish();
-          startActivity(i);
-          overridePendingTransition(R.anim.left_in, R.anim.left_out);
+          if (validatorUtil.isOnline()) {
+              Intent i = new Intent(Usuario.this, EnviarATodos.class );
+              i.putExtra("latitud",latAux);
+              i.putExtra("longitud",lonAux);
+              i.putExtra("idUsuario",idUsusario);
+              startActivity(i);
+              overridePendingTransition(R.anim.left_in, R.anim.left_out);
+          }
 
       }
   });
@@ -453,6 +426,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                 }
         *//////////PARA SACAR USUARIO QUE NO ESTE EN LA REGION_FIN
         super.onStart();
+        EscuchadoViaje();
         boolean muestra4 = getValuePreference4(getApplicationContext());
         System.out.println("valor de terminos "+muestra4);
         if(!muestra4)
@@ -462,7 +436,6 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
         }
 
         VerificarTipo();
-        if (validatorUtil.isOnline()) {
             try {
 
                     mDatabase=FirebaseDatabase.getInstance().getReference().child("users");
@@ -494,14 +467,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else
-            {
-                Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_SHORT);
-                customToast.setGravity(Gravity.CENTER,0,0);
-                customToast.setView(viewLayout);
-                customToast.show();
-            }
+
 
     }
     @Override
@@ -550,7 +516,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (validatorUtil.isOnline()) {
+
             try {
                 if(requestCode==CAMERA_REGUEST_CODE&&resultCode==RESULT_OK)
                 {
@@ -577,20 +543,27 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                             String image=dataSnapshot.getValue().toString();
-                                if(!image.equals("default")&&!image.isEmpty())
-                                {
+                                try {
+                                    if(!image.equals("default")&&!image.isEmpty())
+                                    {
 
-                                    Task<Void> task=FirebaseStorage.getInstance().getReferenceFromUrl(image).delete();
-                                    task.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful())
-                                                Toast.makeText(Usuario.this, "Foto antigua eliminada correctamente", Toast.LENGTH_SHORT).show();
-                                            else
-                                                Toast.makeText(Usuario.this, "Ocurrió un error al eliminar la foto antigua", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                        Task<Void> task=FirebaseStorage.getInstance().getReferenceFromUrl(image).delete();
+                                        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful())
+                                                    Toast.makeText(Usuario.this, "Foto antigua eliminada correctamente", Toast.LENGTH_SHORT).show();
+                                                else
+                                                    Toast.makeText(Usuario.this, "Ocurrió un error al eliminar la foto antigua", Toast.LENGTH_SHORT).show();
+                                            }
 
+                                        });
+
+
+
+                                    }
+                                } catch (IllegalArgumentException e) {
+                                    e.printStackTrace();
                                 }
 
 
@@ -623,14 +596,7 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else
-            {
-                Toast customToast = Toast.makeText(getApplicationContext(),"Toast:Gravity.Top",Toast.LENGTH_SHORT);
-                customToast.setGravity(Gravity.CENTER,0,0);
-                customToast.setView(viewLayout);
-                customToast.show();
-            }
+
     }
 
     @Override
@@ -886,53 +852,10 @@ public class Usuario extends AppCompatActivity implements GoogleApiClient.OnConn
 
     @Override
     public void onClick(View v) {
-        switch (contador) {
-            case 0:
-                showcaseView.setShowcase(t1, true);
-                showcaseView.setContentTitle("Ver taxis");
-                showcaseView.setContentText("presione para ver los taxis en mapa");
-                break;
-            case 1:
 
-                showcaseView.setShowcase(t2, true);
-                showcaseView.setContentTitle("Foto de perfil");
-                showcaseView.setContentText("presione sobre la foto para cambiarla");
-                break;
-            case 2:
-                showcaseView.setShowcase(t3, true);
-                showcaseView.setContentTitle("Cerrar sesión");
-                showcaseView.setContentText("presione para cerrar sesión  y cerrar la app");
-                showcaseView.setButtonText("Finalizar");
-                break;
-
-            case 3:
-                showcaseView.hide();
-                boolean muestra2 = getValuePreference(getApplicationContext());
-                if(muestra2)
-                {
-                    saveValuePreference(getApplicationContext(), false);
-                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-
-                break;
-        }
 
         contador++;
     }
-
-    /////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
-    public  void Ayuda()
-    {
-        contador=0;
-        showcaseView.show();
-        showcaseView.setTarget(Target.NONE);
-        showcaseView.setContentTitle("Bienvenido");
-        showcaseView .setContentText("Vamos a comenzar");
-        showcaseView.setButtonText("Siguiente");
-    }
-    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
 
     ///////////////////////////////////////Para el showCaseView por primera vez___Fin///////////////////////////////////////////
 public void InsertarTel()
@@ -1009,6 +932,53 @@ public void InsertarTel()
     public boolean getValuePreference4(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
         return  preferences.getBoolean("terminos", false);
+    }
+    public void EscuchadoViaje()
+    {
+        try {
+            mDatabaseViaje = FirebaseDatabase.getInstance().getReference().child("users");
+            mDatabaseViaje= mDatabaseViaje.child(mAuth.getCurrentUser().getUid()).child("ViajeA");
+            mDatabaseViaje.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    try {
+
+                       String idUsuario=mAuth.getCurrentUser().getUid();
+                        idUsuario=idUsuario.replace("$","");
+                        System.out.println("WWWW2"+mDatabaseViaje);
+                        String escuchadorViaje = dataSnapshot.getValue().toString();
+                        StringTokenizer token = new StringTokenizer(escuchadorViaje, "#");
+                        String idTaxi="nada",estado;
+                        estado=token.nextToken();
+                        idTaxi=token.nextToken();
+                        System.out.println("estado="+estado+"\nid="+idTaxi);
+                        if (!escuchadorViaje.equals("0#vacio"))
+                        {
+                            if (validatorUtil.isOnline()) {
+                                Intent intent = new Intent(getApplicationContext(),MapsActivityTaxi.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                intent.putExtra("idTaxi",idTaxi);
+                                intent.putExtra("idUsuario",idUsuario);
+                                System.out.println("Cargando datos de viaje22\n"+idTaxi+" \n"+idUsuario);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(),"Cargando datos de viaje", Toast.LENGTH_SHORT).show();
+                            }else Toast.makeText(getApplicationContext(),"No es posible conectarse ahora",Toast.LENGTH_LONG).show();
+                            System.out.println("QQQ pasa pasa");
+                        }
+
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        System.out.println("|||||||||||||||||||||Trono aqui En cargar Viaje");
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } catch (NullPointerException e) {
+        }
     }
 
 }

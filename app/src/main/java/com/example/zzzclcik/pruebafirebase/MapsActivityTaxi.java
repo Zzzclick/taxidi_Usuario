@@ -26,10 +26,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.Manifest;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.Target;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.gms.common.data.Freezable;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -61,7 +57,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 
-public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCallback , View.OnClickListener {
+public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCallback  {
 
     private GoogleMap mMap;
 
@@ -76,9 +72,8 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
     AlertDialog alert = null;
     private DatabaseReference mDatabase;
     boolean aux=false,auxT=false, viajeCancelado = false, viajeTerminado = false;
-    private ShowcaseView showcaseView;
+
     private int contador=0;
-    private Target t1,t2,t3,t4,t5;
 
 
     ObtenerWebService hiloconexion;
@@ -86,10 +81,14 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
     LocationManager locationManager;
     double longitudeBest, latitudeBest;
     private static final int PETICION_PERMISO_LOCALIZACION = 101;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.right_in, R.anim.right_in);
         try {
+
             setContentView(R.layout.activity_maps_taxi);
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -98,10 +97,7 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         GpsActualizacion();
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+
         validatorUtil = new ValidatorUtil(getApplicationContext());
 
         idTaxi = getIntent().getStringExtra("idTaxi");
@@ -118,10 +114,6 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
         terminar=(ImageView)findViewById(R.id.TerminarImageView);
         Imagentelefono=(ImageView)findViewById(R.id.ImaTel);
 
-        t1= new ViewTarget(R.id.ImaNormal, this);
-        t2= new ViewTarget(R.id.ImaHibrido, this);
-        t3= new ViewTarget(R.id.CancelImageView, this);
-        t4= new ViewTarget(R.id.TerminarImageView, this);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
 //Obtiene valor de preferencia (la primera ocasión es por default true).
@@ -129,16 +121,6 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
 
 
 
-
-        ////////////////////////////////////Inicio////////////////////////////////////////////////////////
-        showcaseView=new ShowcaseView.Builder(this)
-                .setTarget(Target.NONE)
-                .setOnClickListener(this)
-                .setContentTitle("Bienvenido")
-                .setContentText("Vamos a comenzar")
-                .setStyle(R.style.Transparencia)
-                .build();
-        showcaseView.setButtonText("Siguiente");
         //Aqui se construye el showCaseView
         ////////////////////////////////////Fin////////////////////////////////////////////////////////////
         ////////////////////////Inicio_______///////////////////////////////////////////
@@ -147,7 +129,7 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
 
             saveValuePreference(getApplicationContext(), false);
             contador=4;
-            showcaseView.hide();
+
 
         }
         /////////////////////////Fin_______/////////////////////////////////////////////
@@ -250,18 +232,23 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             mMap.clear();
+
+
                             try {
                                 escuchador1 = dataSnapshot.child("latitud").getValue().toString();
                                 escuchador2 = dataSnapshot.child("longitud").getValue().toString();
                                 telefono=dataSnapshot.child("telefono").getValue().toString();
-                            } catch (NullPointerException e) {
-                                e.printStackTrace();
-                            }
-                            System.out.println(escuchador1 + "      aquiiiiiiii    " + escuchador2);
-                            try {
+                                String nombre=dataSnapshot.child("name").getValue().toString();
                                     latA = Double.parseDouble(escuchador1);
                                     lonA = Double.parseDouble(escuchador2);
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 18));
+                                System.out.println(escuchador1 + "      aquiiiiiiii    " + escuchador2);
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latA, lonA), 20));
+
+                                mMap.addMarker(new MarkerOptions()
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
+                                        .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                                        .title(nombre)
+                                        .position(new LatLng(latA, lonA)));
                             } catch (NumberFormatException ex) {
                               //  Toast.makeText(getApplicationContext(), "Latitud y longitud no son números", Toast.LENGTH_SHORT).show();
                             }catch (NullPointerException e) {
@@ -269,10 +256,6 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
                             }
 
 
-                            mMap.addMarker(new MarkerOptions()
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.taxidos))
-                                    .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                                    .position(new LatLng(latA, lonA)));
                         }
 
                         @Override
@@ -308,10 +291,21 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
     @Override
     protected void onStart() {
         super.onStart();
+
         CargarPeticionesU();
         aux=true;
         viajeCancelado = false;
         viajeTerminado = false;
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
     }
     @Override
     protected void onDestroy(){
@@ -404,19 +398,13 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
     private  void TerminarViaje()
     {
             try {
-                    DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference().child("taxis");
-                    DatabaseReference currentUserBD=mDatabase.child(idTaxi);
-                    currentUserBD.child("estado").setValue("0");
-                    currentUserBD.child("peticion1").setValue("123");
-                    currentUserBD.child("peticion2").setValue("123");
-                    currentUserBD.child("peticion3").setValue("123");
-                    currentUserBD.child("peticion4").setValue("123");
-                    currentUserBD.child("peticion5").setValue("123");
-                    currentUserBD.child("ViajeA").setValue("0#vacio");
-                    DatabaseReference mDatabase2= FirebaseDatabase.getInstance().getReference().child("users");
-                    DatabaseReference currentUserBD2=mDatabase2.child(idUsuario);
-                    currentUserBD2.child("estado").setValue("0");
-                    currentUserBD2.child("ViajeA").setValue("0#vacio");
+                    DatabaseReference mDatabaseV= FirebaseDatabase.getInstance().getReference().child("taxis");
+                    DatabaseReference mDatabaseV2=mDatabaseV.child(idTaxi);
+                    mDatabaseV2.child("ViajeA").setValue("0#vacio");
+                    DatabaseReference mDatabaseV3= FirebaseDatabase.getInstance().getReference().child("users");
+                    DatabaseReference mDatabaseV4=mDatabaseV3.child(idUsuario);
+                    mDatabaseV4.child("estado").setValue("0");
+                    mDatabaseV4.child("ViajeA").setValue("0#vacio");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -638,89 +626,37 @@ public class MapsActivityTaxi extends FragmentActivity implements OnMapReadyCall
         return  preferences.getBoolean("MapsTaxi", true);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (contador) {
-            case 0:
-                showcaseView.setShowcase(t1, true);
-                showcaseView.setContentTitle("Modo normal");
-                showcaseView.setContentText("Aquí podrás cambiar a modo normal y modo hibrido el mapa ");
-                break;
-            case 1:
-
-                showcaseView.setShowcase(t2, true);
-                showcaseView.setContentTitle("Modo híbrido");
-                showcaseView.setContentText("Aquí podrás ver el tiempo en el que tardara en llegar tu taxi");
-                break;
-            case 2:
-                showcaseView.setShowcase(t3, true);
-                showcaseView.setContentTitle("Cancelar servicio");
-                showcaseView.setContentText("presione para cancelar el servicio");
-                break;
-            case 3:
-                showcaseView.setShowcase(t4, true);
-                showcaseView.setContentTitle("Terminar servicio");
-                showcaseView.setContentText("presione para terminar servicio");
-                showcaseView.setButtonText("Finalizar");
-                break;
-            case 4:
-                showcaseView.hide();
-                boolean muestra2 = getValuePreference(getApplicationContext());
-                if(muestra2)
-                {
-                    saveValuePreference(getApplicationContext(), false);
-                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-                showcaseView.hide();
-                boolean muestra21 = getValuePreference(getApplicationContext());
-                if(muestra21)
-                {
-                    saveValuePreference(getApplicationContext(), false);
-                    //  Toast.makeText(getApplicationContext(),"Primera vez:"+muestra, Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-
-        contador++;
-    }
-
-    /////////////////Volver a mosrtrar el ShowCaseView_______Inicio//////////////////////////////////////////////
-    public  void Ayuda()
-    {
-        contador=0;
-        showcaseView.show();
-        showcaseView.setTarget(Target.NONE);
-        showcaseView.setContentTitle("Bienvenido");
-        showcaseView  .setContentText("Vamos a comenzar");
-        showcaseView.setButtonText("Siguiente");
-    }
-    /////////////////Volver a mosrtrar el ShowCaseView_______Final//////////////////////////////////////////////
-
     ///////////////////////////////////////Para el showCaseView por primera vez___Fin///////////////////////////////////////////
-public void HacerLlamada()
-{
- Intent i =new Intent(Intent.ACTION_CALL);
+    public void HacerLlamada()
+    {
+        try {
+            System.out.println("aquiiii "+telefono);
 
-    try {
-        if(!telefono.isEmpty()&&telefono!=null)
-        {    telefono=telefono.trim();
-            i.setData(Uri.parse("tel:"+telefono));
+
+                if (!telefono.equalsIgnoreCase("no")&&telefono.matches("[0-9]*")) {
+                    Intent i =new Intent(Intent.ACTION_CALL);
+                    System.out.println("QQQ "+telefono);
+                    telefono=telefono.trim();
+                    System.out.println("QQQ2 "+telefono);
+                    if(!telefono.isEmpty()&&telefono!=null||telefono.equalsIgnoreCase("no"))
+                    {
+                        i.setData(Uri.parse("tel:"+telefono));
+                    }
+                    if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)!=PackageManager.PERMISSION_GRANTED)
+                    {
+                        requestPermission();
+                    }else
+                    {
+                        startActivity(i);
+                    }
+                }else if(telefono.equalsIgnoreCase("no")){Toast.makeText(getApplicationContext(),"El conductor no a proporcionado su teléfono", Toast.LENGTH_SHORT).show();}
+                else if(!telefono.matches("[0-9]*")){Toast.makeText(getApplicationContext(),"El usuario no a proporcionado su teléfono correctamente", Toast.LENGTH_SHORT).show();}
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)!=PackageManager.PERMISSION_GRANTED)
-        {
-            requestPermission();
-        }else
-            {
-                startActivity(i);
-            }
-    } catch (NullPointerException e) {
-        Toast.makeText(getApplicationContext(),"El usuario no proporciono su numero celular", Toast.LENGTH_SHORT).show();
-        e.printStackTrace();
-    }
 
-}
+    }
 public void requestPermission()
 {
     ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CALL_PHONE},1);
@@ -961,5 +897,13 @@ public void requestPermission()
                 });
         dialog.show();
     }
-
+    private static boolean esNumero(String cadena){
+        try {
+            Integer.parseInt(cadena);
+            if (cadena.matches("[0-9]*")){}
+            return true;
+        } catch (NumberFormatException nfe){
+            return false;
+        }
+    }
 }
